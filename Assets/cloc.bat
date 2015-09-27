@@ -1,0 +1,2 @@
+cloc.exe scripts
+pause
