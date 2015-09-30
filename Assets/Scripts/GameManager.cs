@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour {
 
 	public bool paused = false;
 	public float ticks = 10f;
-	float delay = 0.1f;
+
 
 	public ResourceManager resourceManager;
 	public StructureManager structureManager;
@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour {
 	public UnlockManager unlockManager;
 
 	void Start (){
+		QualitySettings.vSyncCount = 0;  // VSync must be disabled
+		Application.targetFrameRate = 25;
+
 		resourceManager = GetComponent<ResourceManager> ();
 		structureManager = GetComponent<StructureManager> ();
 		uiManager = GetComponent<UIManager>();
@@ -29,6 +32,7 @@ public class GameManager : MonoBehaviour {
 		StartCoroutine (GameLoop ());
 	}
 
+	float delay = 0.1f;
 	IEnumerator GameLoop (){
 		while(!paused) {
 			yield return new WaitForSeconds (delay);
@@ -43,7 +47,8 @@ public class GameManager : MonoBehaviour {
 				if(!struc.passiveStructure)
 					structureManager.DoTick (struc);
 
-			uiManager.UpdateUI();
+			if(uiManager.isMenu)
+				uiManager.UpdateUI();
 		}
 	}
 
