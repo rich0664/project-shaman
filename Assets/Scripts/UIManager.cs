@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityStandardAssets.ImageEffects;
+using UnityEngine.EventSystems;
 
 public class UIManager : MonoBehaviour {
 
@@ -12,8 +13,10 @@ public class UIManager : MonoBehaviour {
 	bool isShamanMenuOpen;
 	bool shouldCheckMenu;
 	GameObject ShamanMenu;
+	EventSystem MES;
 
 	public void StartUp(){
+		MES = GameObject.Find("EventSystem").GetComponent<EventSystem>();
 		GM = GetComponent<GameManager>();
 		canvasObj = GameObject.Find("UICanvas");
 		ShamanMenuAnimator = canvasObj.transform.Find("ShamanMenu").GetComponent<Animator>();
@@ -59,16 +62,19 @@ public class UIManager : MonoBehaviour {
 		isMenu = !isMenu;
 		Camera.main.GetComponent<BlurOptimized>().enabled = isMenu;
 
+		canvasObj.transform.Find(str).gameObject.SetActive(isMenu);
 		if(str == "Structures"){
-			canvasObj.transform.Find(str).gameObject.SetActive(isMenu);
 			if(isMenu)
 				StructureTooltip("Drug Farm");
+		}else if(str == "Leadership"){
+			MES.SetSelectedGameObject(
+				canvasObj.transform.Find(str + "/Tabs/Resources/Button").gameObject);
 		}
 		ShamanMenu.SetActive(!isMenu); 
 	}
 
 	void UpdateResources(){
-		Transform resources = canvasObj.transform.Find("Resources");
+		Transform resources = canvasObj.transform.Find("Leadership/Resources");
 		int items = 0;
 		foreach(ResourceManager.Resource res in GM.resourceManager.resources){
 			if(!resources.Find(res.name))
@@ -181,7 +187,7 @@ public class UIManager : MonoBehaviour {
 			cstInst.transform.localScale = Vector3.one;
 			Image prcnt = cstInst.transform.Find("Cost/PercentBar").GetComponent<Image>();
 			Image costIcon = cstInst.transform.Find("Cost/PercentBar/CostButton").GetComponent<Image>();
-			Debug.Log(Resources.Load("ResourceIcons/" + cst.resource));
+			//Debug.Log(Resources.Load("ResourceIcons/" + cst.resource));
 			costIcon.sprite = Resources.Load<Sprite>("ResourceIcons/" + cst.resource);
 
 			ResourceManager.Resource tmpRes = GM.resourceManager.GetResource(cst.resource);
