@@ -9,15 +9,26 @@ public class GridManager : MonoBehaviour {
 	public int expandInc = 8;
 	public int rings;
 	public int spots = 8;
-	public GameObject BasePref;
+	GameManager GM;
+	GameObject spotPref;
+	GameObject ringParent;
 	float rotat = 0f;
 
 
 	void Start(){
-		StartCoroutine(TestLoop());
+		//StartCoroutine(TestLoop());
+		spotPref = Resources.Load("BuildingPrefabs/Spot") as GameObject;
+		ringParent = new GameObject(); ringParent.name = "Rings";
+		GM = GetComponent<GameManager>();
 	}
 
-	public void Expand(){
+	public void TryExpand(bool str){
+		if(str){
+			Expand();
+		}
+	}
+
+	void Expand(){
 		if(rings >= expandAt){
 			expandAt += expandInc;
 			expandInc *= 2;
@@ -26,15 +37,17 @@ public class GridManager : MonoBehaviour {
 			rotat = rotationIncrement;
 		}
 		GameObject Ring = new GameObject();
-		Ring.name = "Ring";
+		Ring.name = "Ring" + (rings + 1); Ring.transform.SetParent(ringParent.transform);
 		for(int i = 0; i < spots; i++){
-			GameObject spotInst = GameObject.Instantiate(BasePref);
+			GameObject spotInst = GameObject.Instantiate(spotPref);
 			spotInst.transform.SetParent(Ring.transform);
-			spotInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + 6f);
+			spotInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + 7f);
 			spotInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / spots) * i);
 		}
 		Ring.transform.RotateAround(Vector3.zero, Vector3.up, rotat);
-		rotat += rotationIncrement;
+		if(rotat == rotationIncrement){
+			rotat = 0f;
+		}else{ rotat = rotationIncrement; }
 		rings++;
 
 	}

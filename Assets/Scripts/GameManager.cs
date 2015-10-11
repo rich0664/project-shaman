@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour {
 
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
-		Application.targetFrameRate = 25;
+		Application.targetFrameRate = 30;
 
 		resourceManager = GetComponent<ResourceManager> ();
 		structureManager = GetComponent<StructureManager> ();

@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour {
 			strucGO.transform.SetParent(structRekt);
 			strucGO.transform.localScale = Vector3.one;
 			strucGO.SetActive(struc.discovered);
+			Sprite strucIcon = Resources.Load<Sprite>("BuildingIcons/" + strucGO.name);
+			strucGO.transform.Find("Struct/Image").GetComponent<Image>().sprite = strucIcon;
 			Button button = strucGO.transform.Find("Struct/Button").GetComponent<Button>();
 			button.onClick.AddListener(delegate { StructureTooltip(strucGO.name); });
 		}
@@ -111,8 +113,48 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
+
 	GameObject toolTip;
 	string lastTooltip;
+	public void QuickBuildTooltip(){
+		if(toolTip)
+			Destroy(toolTip);
+		lastTooltip = "QuickBuild";
+		Transform templates = canvasObj.transform.Find("Templates");
+		GameObject quickTemp = templates.Find("QuickBuild").gameObject;
+		toolTip = GameObject.Instantiate(quickTemp);
+		toolTip.transform.SetParent(templates);
+		toolTip.name = "QuickBuildTooltip";
+		toolTip.SetActive(true);
+		toolTip.transform.localScale = Vector3.one;
+		toolTip.transform.localPosition = Vector3.zero;
+		Transform container = toolTip.transform.Find("ScrollSnap/Container");
+		GameObject bTemp = toolTip.transform.Find("Buildings").gameObject;
+		GameObject icoTemp = toolTip.transform.Find("Buildings/Holder").gameObject;
+		int count = 4;
+		GameObject bInst = null;
+		for(int i = 0; i < GM.structureManager.structures.Count; i++){
+			if(count >= 4){
+				count = 0;
+				bInst = GameObject.Instantiate(bTemp);
+				bInst.transform.SetParent(container);
+				bInst.SetActive(true);
+				bInst.transform.localScale = Vector3.one;
+				toolTip.transform.Find("ScrollSnap").GetComponent<ScrollSnapRect>().Reset();
+			}
+			StructureManager.Structure tmpStruc = GM.structureManager.structures[i];
+			if(GM.structureManager.CanBuyStructure(tmpStruc) && tmpStruc.discovered){
+				GameObject icoInst = GameObject.Instantiate(icoTemp);
+				icoInst.transform.SetParent(bInst.transform);
+				icoInst.SetActive(true);
+				icoInst.transform.localScale = Vector3.one;
+				Sprite strucIcon = Resources.Load<Sprite>("BuildingIcons/" + tmpStruc.name);
+				icoInst.transform.Find("Image").GetComponent<Image>().sprite = strucIcon;
+				count++;
+			}
+		}
+	}
+
 	public void ResourceTooltip(string str){
 		if(toolTip)
 			Destroy(toolTip);
@@ -130,7 +172,7 @@ public class UIManager : MonoBehaviour {
 
 		RectTransform rekt = toolTip.GetComponent<RectTransform>();
 		rekt.sizeDelta = new Vector2(150f, 10f + 20f * tmpRes.contributors.activeContributors());
-		rekt.position = canvasObj.transform.Find("Resources/" + str + "/Rate").position + new Vector3(10f,0f,0f);
+		rekt.position = canvasObj.transform.Find("Leadership/Resources/" + str + "/Rate").position + new Vector3(10f,0f,0f);
 	}
 
 	public void cool(string wat){
