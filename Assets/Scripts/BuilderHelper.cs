@@ -8,8 +8,9 @@ public class BuilderHelper : MonoBehaviour {
 	bool wasClick = false;
 	Vector3 prevPos;
 	Spot lastSpot;
-	public List<Spot> spotList;
-	public List<PhysicalStructure> pStructList;
+	[HideInInspector] public List<Spot> spotList;
+	[HideInInspector] public List<Spot> emptySpots;
+	[HideInInspector] public List<PhysicalStructure> pStructList;
 
 	// Use this for initialization
 	void Start () {
@@ -40,6 +41,37 @@ public class BuilderHelper : MonoBehaviour {
 		}
 	}
 
+	public void BatchBuild(string toBuild, int buildCount, Vector3 buildCenter){
+		RefreshEmptySpots();
+		for(int i = 0; i < buildCount; i++){
+			lastSpot = GetClosestSpot(buildCenter);
+			BuildOnSpot(toBuild);
+		}
+	}
+
+	public void RefreshEmptySpots(){
+		emptySpots = new List<Spot>();
+		foreach(Spot spt in spotList)
+			if(!spt.filled)
+				emptySpots.Add(spt);
+	}
+
+	public Spot GetClosestSpot(Vector3 refPoint){
+		Spot closeSpot = emptySpots[0];
+		float dist = 9999999f;
+		int spotIndex = 0;
+		for(int i = 0; i < emptySpots.Count; i++){
+			float tmpDist = Vector3.Distance(refPoint, emptySpots[i].transform.position);
+			if(tmpDist < dist){
+				closeSpot = emptySpots[i];
+				dist = tmpDist;
+				spotIndex = i;
+			}
+		}
+		emptySpots.RemoveAt(spotIndex);
+		return closeSpot;
+	}
+
 	void CheckClick(){
 		if(GM.uiManager.isMenu )
 			return;
@@ -65,10 +97,12 @@ public class BuilderHelper : MonoBehaviour {
 			rayPos = new Vector3(Input.touches[0].position.x,
 			                     Input.touches[0].position.y, 0f);
 		}
-		if(GM.uiManager.toolTip)
+
 		if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()){
-			GM.uiManager.KillTooltip(true);
-			return;
+			if(GM.uiManager.toolTip){
+				GM.uiManager.KillTooltip(true);
+				return;
+			}
 		}else{
 			return;
 		}

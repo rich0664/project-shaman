@@ -85,11 +85,15 @@ public class UIManager : MonoBehaviour
 
 		canvasObj.transform.Find (str).gameObject.SetActive (isMenu);
 		if (str == "Structures") {
-			if (isMenu)
+			if (isMenu){
 				StructureTooltip ("Drug Farm");
+			}else{
+				KillTooltip(true);
+			}
 		} else if (str == "Leadership") {
 			MES.SetSelectedGameObject (
 				canvasObj.transform.Find (str + "/Tabs/Resources/Button").gameObject);
+				KillTooltip(true);
 		}
 		ShamanMenu.SetActive (!isMenu); 
 	}
@@ -278,6 +282,7 @@ public class UIManager : MonoBehaviour
 			rekt.offsetMin = new Vector2 (rekt.offsetMin.x, 0f);
 			rekt.offsetMax = new Vector2 (rekt.offsetMax.x, 0f);
 			rekt.anchoredPosition = Vector2.zero;
+			GM.builderHelper.RefreshEmptySpots();
 		}
 
 		StructureManager.Structure tmpStruc = GM.structureManager.GetStructure (str);
@@ -290,9 +295,13 @@ public class UIManager : MonoBehaviour
 		Button buyButton = toolTip.transform.Find ("StructIcon").GetComponent<Button> ();
 		buyButton.onClick.RemoveAllListeners ();
 		buyButton.onClick.AddListener (delegate {
-			GM.structureManager.BuyStructure (str);
+			GM.builderHelper.BatchBuild (str, 1, Vector3.zero);
 		});
-		buyButton.interactable = GM.structureManager.CanBuyStructure (tmpStruc);
+		if(GM.builderHelper.emptySpots.Count == 0){
+			buyButton.interactable = false;
+		}else{
+			buyButton.interactable = GM.structureManager.CanBuyStructure (tmpStruc);
+		}
 
 		Text NameText = toolTip.transform.Find ("NameText").GetComponent<Text> ();
 		NameText.text = tmpStruc.name;

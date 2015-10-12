@@ -19,6 +19,7 @@ public class UnlockManager : MonoBehaviour {
 		}
 		public costMode costType;
 		public float unlockAt;
+		public bool unlocked = false;
 	}
 
 	public List<Unlock> unlocks;
@@ -38,6 +39,8 @@ public class UnlockManager : MonoBehaviour {
 
 	public void CheckUnlocks(){
 		foreach(Unlock unlck in unlocks){
+			if(unlck.unlocked)
+				continue;
 			int enumIndex = (int)unlck.targetType;
 			switch (enumIndex) {
 				case 1: //resource
@@ -57,8 +60,10 @@ public class UnlockManager : MonoBehaviour {
 							break;
 					}
 					StructureManager.Structure targetStruc = GM.structureManager.GetStructure(unlck.targetName);
-					if(tmpAmount >= unlck.unlockAt)
+					if(tmpAmount >= unlck.unlockAt){
 						targetStruc.discovered = true;
+						unlck.unlocked = true;
+					}
 					break;
 			}
 		}
