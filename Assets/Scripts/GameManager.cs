@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
 	public StructureManager structureManager;
 	public UIManager uiManager;
 	public UnlockManager unlockManager;
+	public BuilderHelper builderHelper;
 
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
@@ -20,8 +21,10 @@ public class GameManager : MonoBehaviour {
 		structureManager = GetComponent<StructureManager> ();
 		uiManager = GetComponent<UIManager>();
 		unlockManager = GetComponent<UnlockManager>();
+		builderHelper = GetComponent<BuilderHelper>();
 
-		//LoadHere
+		LoadSequence();
+
 		resourceManager.StartUp ();
 		structureManager.StartUp ();
 		unlockManager.StartUp();
@@ -46,17 +49,19 @@ public class GameManager : MonoBehaviour {
 			foreach(StructureManager.Structure struc in structureManager.structures)
 				if(!struc.passiveStructure)
 					structureManager.DoTick (struc);
-
-			if(uiManager.isMenu)
-				uiManager.UpdateUI();
+		
+			uiManager.UpdateUI();
 		}
 	}
 
-	public void WerkHard(float value){
+	public void Forage(float value){
 		ResourceManager.Resource tmpDough = resourceManager.GetResource("Dough");
 		tmpDough.amount += value;
 	}
 
+	void LoadSequence(){
+
+	}
 
 	//end class
 }

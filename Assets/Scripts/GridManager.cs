@@ -17,9 +17,10 @@ public class GridManager : MonoBehaviour {
 
 	void Start(){
 		//StartCoroutine(TestLoop());
-		spotPref = Resources.Load("BuildingPrefabs/Spot") as GameObject;
+		spotPref = Resources.Load<GameObject>("BuildingPrefabs/Spot");
 		ringParent = new GameObject(); ringParent.name = "Rings";
 		GM = GetComponent<GameManager>();
+		Expand();
 	}
 
 	public void TryExpand(bool str){
@@ -43,6 +44,7 @@ public class GridManager : MonoBehaviour {
 			spotInst.transform.SetParent(Ring.transform);
 			spotInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + 7f);
 			spotInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / spots) * i);
+			GM.builderHelper.spotList.Add(spotInst.GetComponent<Spot>());
 		}
 		Ring.transform.RotateAround(Vector3.zero, Vector3.up, rotat);
 		if(rotat == rotationIncrement){
