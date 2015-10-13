@@ -9,6 +9,7 @@ public class GridManager : MonoBehaviour {
 	public int expandInc = 8;
 	public int rings;
 	public int spots = 8;
+	public int foliageCount = 30;
 	GameManager GM;
 	GameObject spotPref;
 	GameObject ringParent;
@@ -20,13 +21,38 @@ public class GridManager : MonoBehaviour {
 		spotPref = Resources.Load<GameObject>("BuildingPrefabs/Spot");
 		ringParent = new GameObject(); ringParent.name = "Rings";
 		GM = GetComponent<GameManager>();
-		Expand();
+		ProcessFoliage();
 	}
 
 	public void TryExpand(bool str){
 		if(str){
 			Expand();
 		}
+	}
+
+	void ProcessFoliage(){
+		if(GameObject.Find("Foliage"))
+		   Destroy(GameObject.Find("Foliage"));
+
+		GameObject foliageParent = new GameObject();
+		foliageParent.name = "Foliage";
+		GameObject treePref = Resources.Load<GameObject>("BuildingPrefabs/Tree");
+		GameObject shrubPref = Resources.Load<GameObject>("BuildingPrefabs/Shrub");
+		for(int i = 0; i < foliageCount; i++){
+			GameObject treeInst = GameObject.Instantiate(shrubPref);
+			treeInst.transform.SetParent(foliageParent.transform);
+			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(11.5f, 26.5f));
+			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-4.0f, 4.0f));
+			treeInst.transform.localScale *= Random.Range(0.4f, 1.1f);
+		}
+		for(int i = 0; i < foliageCount; i++){
+			GameObject treeInst = GameObject.Instantiate(treePref);
+			treeInst.transform.SetParent(foliageParent.transform);
+			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(12.5f, 30.5f));
+			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-4.0f, 4.0f));
+			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
+		}
+		foliageCount += (int)expandIncrement;
 	}
 
 	void Expand(){
@@ -46,12 +72,13 @@ public class GridManager : MonoBehaviour {
 			spotInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / spots) * i);
 			GM.builderHelper.spotList.Add(spotInst.GetComponent<Spot>());
 		}
+		ProcessFoliage();
 		Ring.transform.RotateAround(Vector3.zero, Vector3.up, rotat);
 		if(rotat == rotationIncrement){
 			rotat = 0f;
 		}else{ rotat = rotationIncrement; }
 		rings++;
-
+		GM.gameCamera.ExpandDistance(52f);
 	}
 
 	IEnumerator TestLoop(){

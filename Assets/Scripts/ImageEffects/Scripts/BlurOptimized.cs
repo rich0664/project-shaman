@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-    [ExecuteInEditMode]
     [RequireComponent (typeof(Camera))]
     [AddComponentMenu ("Image Effects/Blur/Blur (Optimized)")]
     public class BlurOptimized : PostEffectsBase
@@ -46,8 +45,8 @@ namespace UnityStandardAssets.ImageEffects
 
         public void OnRenderImage (RenderTexture source, RenderTexture destination) {
             if (CheckResources() == false) {
-                Graphics.Blit (source, destination);
-                return;
+             //   Graphics.Blit (source, destination);
+             //   return;
             }
 
             float widthMod = 1.0f / (1.0f * (1<<downsample));
@@ -85,7 +84,7 @@ namespace UnityStandardAssets.ImageEffects
                 rt = rt2;
             }
 
-            Graphics.Blit (rt, destination);
+            Graphics.Blit (rt, destination, blurMaterial, 0);
 
             RenderTexture.ReleaseTemporary (rt);
         }

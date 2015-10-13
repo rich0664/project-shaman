@@ -81,7 +81,7 @@ public class UIManager : MonoBehaviour
 	public void ToggleMenu (string str)
 	{
 		isMenu = !isMenu;
-		Camera.main.GetComponent<BlurOptimized> ().enabled = isMenu;
+		Camera.main.GetComponent<Blur> ().enabled = isMenu;
 
 		canvasObj.transform.Find (str).gameObject.SetActive (isMenu);
 		if (str == "Structures") {
@@ -94,6 +94,8 @@ public class UIManager : MonoBehaviour
 			MES.SetSelectedGameObject (
 				canvasObj.transform.Find (str + "/Tabs/Resources/Button").gameObject);
 				KillTooltip(true);
+		} else if (str == "GameMenu") {
+			KillTooltip(true);
 		}
 		ShamanMenu.SetActive (!isMenu); 
 	}
@@ -282,6 +284,8 @@ public class UIManager : MonoBehaviour
 			rekt.offsetMin = new Vector2 (rekt.offsetMin.x, 0f);
 			rekt.offsetMax = new Vector2 (rekt.offsetMax.x, 0f);
 			rekt.anchoredPosition = Vector2.zero;
+			Image strucIcon = toolTip.transform.Find ("StructIcon").GetComponent<Image> ();
+			strucIcon.sprite = Resources.Load<Sprite> ("BuildingSprites/" + str);
 			GM.builderHelper.RefreshEmptySpots();
 		}
 

@@ -30,7 +30,7 @@ public class BuilderHelper : MonoBehaviour {
 		GameObject buildInst = GameObject.Instantiate(Resources.Load<GameObject>("BuildingPrefabs/" + typeToBuild));
 		buildInst.transform.SetParent(lastSpot.transform);
 		buildInst.transform.localPosition = Vector3.zero;
-		buildInst.transform.localScale = Vector3.one;
+		//buildInst.transform.localScale = Vector3.one;
 		buildInst.GetComponent<PhysicalStructure>().structure = GM.structureManager.GetStructure(typeToBuild);
 		pStructList.Add(buildInst.GetComponent<PhysicalStructure>());
 		GM.structureManager.BuyStructure(typeToBuild);
@@ -75,7 +75,7 @@ public class BuilderHelper : MonoBehaviour {
 	void CheckClick(){
 		if(GM.uiManager.isMenu )
 			return;
-		if(Input.touchCount != 1 && !Input.GetMouseButtonUp(0) && !Input.GetMouseButtonDown(0))
+		if(!Input.GetMouseButtonUp(0) && !Input.GetMouseButtonDown(0))
 			return;
 		if(Input.GetMouseButtonDown(0)){
 			wasClick = true;
@@ -87,16 +87,8 @@ public class BuilderHelper : MonoBehaviour {
 			if(prevPos != Input.mousePosition)
 				return;
 		}
-		if(Input.touchCount == 1)
-			if(Input.touches[0].tapCount != 1)
-				return;
 		Vector3 rayPos = Vector3.zero;
-		if(Input.GetMouseButtonUp(0)){
-			rayPos = Input.mousePosition;
-		}else{
-			rayPos = new Vector3(Input.touches[0].position.x,
-			                     Input.touches[0].position.y, 0f);
-		}
+		rayPos = Input.mousePosition;
 
 		if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()){
 			if(GM.uiManager.toolTip){

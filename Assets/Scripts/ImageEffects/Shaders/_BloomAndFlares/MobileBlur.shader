@@ -162,13 +162,14 @@ Shader "Hidden/FastBlur" {
 	ENDCG
 	
 	SubShader {
-	  ZTest Off Cull Off ZWrite Off Blend Off
+	  ZTest Always Cull Off ZWrite Off
 
 	// 0
 	Pass { 
 	
 		CGPROGRAM
 		
+		#pragma target 3.0
 		#pragma vertex vert4Tap
 		#pragma fragment fragDownsample
 		
@@ -178,11 +179,10 @@ Shader "Hidden/FastBlur" {
 
 	// 1
 	Pass {
-		ZTest Always
-		Cull Off
 		
 		CGPROGRAM 
 		
+		#pragma target 3.0
 		#pragma vertex vertBlurVertical
 		#pragma fragment fragBlur8
 		
@@ -191,11 +191,9 @@ Shader "Hidden/FastBlur" {
 		
 	// 2
 	Pass {		
-		ZTest Always
-		Cull Off
-				
 		CGPROGRAM
 		
+		#pragma target 3.0
 		#pragma vertex vertBlurHorizontal
 		#pragma fragment fragBlur8
 		
@@ -204,12 +202,10 @@ Shader "Hidden/FastBlur" {
 
 	// alternate blur
 	// 3
-	Pass {
-		ZTest Always
-		Cull Off
-		
+	Pass {		
 		CGPROGRAM 
 		
+		#pragma target 3.0
 		#pragma vertex vertBlurVerticalSGX
 		#pragma fragment fragBlurSGX
 		
@@ -218,11 +214,9 @@ Shader "Hidden/FastBlur" {
 		
 	// 4
 	Pass {		
-		ZTest Always
-		Cull Off
-				
 		CGPROGRAM
 		
+		#pragma target 3.0
 		#pragma vertex vertBlurHorizontalSGX
 		#pragma fragment fragBlurSGX
 		

@@ -10,8 +10,10 @@ public class GameManager : MonoBehaviour {
 	public ResourceManager resourceManager;
 	public StructureManager structureManager;
 	public UIManager uiManager;
+	public GridManager gridManager;
 	public UnlockManager unlockManager;
 	public BuilderHelper builderHelper;
+	public MouseOrbit gameCamera;
 
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
@@ -20,8 +22,10 @@ public class GameManager : MonoBehaviour {
 		resourceManager = GetComponent<ResourceManager> ();
 		structureManager = GetComponent<StructureManager> ();
 		uiManager = GetComponent<UIManager>();
+		gridManager = GetComponent<GridManager>();
 		unlockManager = GetComponent<UnlockManager>();
 		builderHelper = GetComponent<BuilderHelper>();
+		gameCamera = Camera.main.GetComponent<MouseOrbit>();
 
 		LoadSequence();
 
