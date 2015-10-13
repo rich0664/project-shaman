@@ -16,6 +16,7 @@ public class MouseOrbit : MonoBehaviour
 	public float distanceMax = 15f;
 	public float maxZoom = 500f;
 	public float offsetLimit = 1f;
+	float overZoom = 0f;
 	Vector3 targOffset = Vector3.zero;
 	float x = 0.0f;
 	float y = 0.0f;
@@ -39,10 +40,11 @@ public class MouseOrbit : MonoBehaviour
 	{
 		if (distanceMax < maxZoom) {
 			distanceMax += expInc;
-			offsetLimit += GM.gridManager.expandIncrement;
 		} else {
 			distanceMax = maxZoom;
+			overZoom += expInc;
 		}
+		offsetLimit += GM.gridManager.expandIncrement;
 		distance = distanceMax;
 	}
 
@@ -63,8 +65,8 @@ public class MouseOrbit : MonoBehaviour
 	void FixOffset ()
 	{
 		float limit = offsetLimit;
-		float percent = (distance - distanceMin) / (distanceMax - distanceMin);
-		limit = (1 - percent) * limit;
+		float percent = (distance - distanceMin) / (overZoom + distanceMax - distanceMin);
+		limit = (1 - percent) * limit + 8f;
 		targOffset.y = 0f;
 		targOffset.x = Mathf.Clamp (targOffset.x, -limit, limit);
 		targOffset.z = Mathf.Clamp (targOffset.z, -limit, limit);
@@ -92,7 +94,7 @@ public class MouseOrbit : MonoBehaviour
 				}
 
 				if (Input.GetMouseButton (0) && Input.touchCount == 0) {
-					targOffset += transform.right * Input.GetAxis ("Mouse X") * 0.2f;				
+					targOffset += transform.right * Input.GetAxis ("Mouse X") * 0.2f;
 					targOffset += transform.forward * Input.GetAxis ("Mouse Y") * 0.2f;
 				}
 				if (Input.touchCount == 2) {
