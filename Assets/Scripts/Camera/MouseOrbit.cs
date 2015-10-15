@@ -17,6 +17,7 @@ public class MouseOrbit : MonoBehaviour
 	public float distanceMax = 15f;
 	public float maxZoom = 500f;
 	public float offsetLimit = 1f;
+	public float GPanSpeed = 80f;
 	float overZoom = 0f;
 	Vector3 targOffset = Vector3.zero;
 	float x = 0.0f;
@@ -37,6 +38,10 @@ public class MouseOrbit : MonoBehaviour
 
 		GM = GameObject.Find ("Management").GetComponent<GameManager> ();
 		invertPan = GameObject.Find ("UICanvas").transform.Find("GameMenu/InvertPan").GetComponent<Toggle>();
+	}
+
+	public void SetSensitivity (float sensitivity){
+		GPanSpeed = sensitivity;
 	}
 
 	public void ExpandDistance (float expInc)
@@ -95,19 +100,19 @@ public class MouseOrbit : MonoBehaviour
 						float dirMult = 1f;
 						if(invertPan.isOn)
 							dirMult = -dirMult;
-						float panSpeed = 0.2f * zoomMult;
+						float panSpeed = (GPanSpeed / 500f) * zoomMult;
 						targOffset += transform.right * -Input.GetAxis ("Mouse X") * panSpeed * dirMult;
 						targOffset += transform.forward * -Input.GetAxis ("Mouse Y") * panSpeed * dirMult;
 					}
 					if(Input.touchCount == 1){
 						Vector2 tdp = Input.GetTouch (0).deltaPosition;
-						x += (tdp.x / Screen.width) * xSpeed * distance * 12.75f;
+						x += (tdp.x / Screen.width) * xSpeed * distance * 14.75f;
 						y -= (tdp.y / Screen.height) * ySpeed * 12.75f;
 						y = ClampAngle (y, yMinLimit, yMaxLimit);
 					}
 					if (Input.touchCount == 2) {
-						float panSpeed = 0.4f * zoomMult;
-						float zoomSpeed = 2.75f * zoomMult;
+						float panSpeed = GPanSpeed * zoomMult;
+						float zoomSpeed = 2.25f * zoomMult;
 						float dirMult = 1f;
 						if(invertPan.isOn)
 							dirMult = -dirMult;
@@ -122,19 +127,19 @@ public class MouseOrbit : MonoBehaviour
 						Vector2 prevMidTouch = (touchZeroPrevPos + touchOnePrevPos) * 0.5f;
 						Vector2 deltaMid = midTouch - prevMidTouch;
 					
-						targOffset += transform.right * -deltaMid.x * panSpeed * dirMult;
-						targOffset += transform.forward * -deltaMid.y * panSpeed * dirMult;
+						targOffset += transform.right * (-deltaMid.x / (float)Screen.width) * panSpeed * dirMult;
+						targOffset += transform.forward * (-deltaMid.y / (float)Screen.height) * panSpeed * dirMult;
 						distance = Mathf.Clamp (distance + deltaMagnitudeDiff * zoomSpeed, distanceMin, distanceMax);
 					}
 				}else{
 					if(Input.touchCount == 1){
-						float panSpeed = 0.4f * zoomMult;
+						float panSpeed = GPanSpeed * zoomMult;
 						Touch touchZero = Input.GetTouch (0);
-						targOffset += transform.right * touchZero.deltaPosition.x * panSpeed;
-						targOffset += transform.forward * touchZero.deltaPosition.y * panSpeed;
+						targOffset += transform.right * (touchZero.deltaPosition.x / (float)Screen.width) * panSpeed;
+						targOffset += transform.forward * (touchZero.deltaPosition.y / (float)Screen.height) * panSpeed;
 					}
 					if (Input.GetMouseButton (0) && Input.touchCount == 0) {
-						float panSpeed = 0.2f * zoomMult;
+						float panSpeed = (GPanSpeed / 500f) * zoomMult;
 						targOffset += transform.right * Input.GetAxis ("Mouse X") * panSpeed;
 						targOffset += transform.forward * Input.GetAxis ("Mouse Y") * panSpeed;
 					}
@@ -156,8 +161,8 @@ public class MouseOrbit : MonoBehaviour
 			Vector3 negDistance = new Vector3 (0.0f, 0.0f, -distance);
 			Vector3 position = rotation * negDistance + target.position + targOffset;
 				
-			transform.rotation = Quaternion.Slerp (transform.rotation, rotation, Time.smoothDeltaTime * 18f);
-			transform.position = Vector3.Lerp (transform.position, position, Time.smoothDeltaTime * 18f);
+			transform.rotation = Quaternion.Slerp (transform.rotation, rotation, Time.smoothDeltaTime * 12f);
+			transform.position = Vector3.Lerp (transform.position, position, Time.smoothDeltaTime * 12f);
 			
 		}
 		
