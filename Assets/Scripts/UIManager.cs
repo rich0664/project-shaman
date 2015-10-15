@@ -147,6 +147,8 @@ public class UIManager : MonoBehaviour
 	List<string> couldBuyList;
 
 	public void StructInfo(string structType){
+		if(GM.builderHelper.isPlacing)
+			return;
 		if(toolTip)
 			Destroy(toolTip);
 		lastTooltip = "StructInfo";
@@ -165,6 +167,8 @@ public class UIManager : MonoBehaviour
 
 	public void QuickBuildTooltip ()
 	{
+		if(GM.builderHelper.isPlacing)
+			return;
 		if (toolTip)
 		if (toolTip.name == "QuickBuildTooltip") {
 			List<string> canBuyList = new List<string> ();
@@ -288,8 +292,14 @@ public class UIManager : MonoBehaviour
 			strucIcon.sprite = Resources.Load<Sprite> ("BuildingSprites/" + str);
 			GM.builderHelper.RefreshEmptySpots();
 		}
-
 		StructureManager.Structure tmpStruc = GM.structureManager.GetStructure (str);
+		Slider batchSlider = toolTip.transform.Find ("Slider").GetComponent<Slider> ();
+		batchSlider.maxValue = GM.structureManager.CountCanBuy(tmpStruc);
+		if(batchSlider.maxValue == 0){
+			batchSlider.minValue = 0;}else
+			batchSlider.minValue = 1;
+		toolTip.transform.Find ("Slider/ValueText").GetComponent<Text> ().text = batchSlider.value.ToString();
+		toolTip.transform.Find ("Slider/MaxText").GetComponent<Text> ().text = batchSlider.maxValue.ToString();
 		int costCount = tmpStruc.costs.Count;
 		int effectCount = tmpStruc.effects.Count + tmpStruc.activeEffects.Count + tmpStruc.activeCosts.Count;
 		Transform lch = toolTip.transform.Find ("CostHead/CostInfo");
@@ -297,10 +307,6 @@ public class UIManager : MonoBehaviour
 		GameObject costemplate = lch.Find ("Template").gameObject;
 		GameObject effectemplate = leh.Find ("Template").gameObject;
 		Button buyButton = toolTip.transform.Find ("StructIcon").GetComponent<Button> ();
-		buyButton.onClick.RemoveAllListeners ();
-		buyButton.onClick.AddListener (delegate {
-			GM.builderHelper.BatchBuild (str, 1, Vector3.zero);
-		});
 		if(GM.builderHelper.emptySpots.Count == 0){
 			buyButton.interactable = false;
 		}else{

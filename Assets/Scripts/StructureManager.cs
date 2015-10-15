@@ -27,7 +27,7 @@ public class StructureManager : MonoBehaviour {
 		public List<Cost> activeCosts;
 
 	}
-
+	
 	public void DoTick(Structure struc){
 		foreach(Cost cst in struc.activeCosts){
 			ResourceManager.Resource tmpRes = GM.resourceManager.GetResource (cst.resource);
@@ -64,6 +64,31 @@ public class StructureManager : MonoBehaviour {
 			if(GM.resourceManager.GetResource (cst.resource).amount < (cst.amount * struc.costMultiplier) + (struc.amount * cst.scaling))
 				tmpCanBuy = false;
 		return tmpCanBuy;
+	}
+
+	public int CountCanBuy(Structure struc){
+		int count = 0; bool first = true; 
+		int maxCount = GM.builderHelper.emptySpots.Count;
+		foreach(Cost cst in struc.costs){
+			if(cst.scaling != 0f){
+				float fakeAmount = GM.resourceManager.GetResource (cst.resource).amount;
+				bool hasRes = true; int buyCount = 0; int actCount = (int)struc.amount;
+				while(hasRes){
+					if(buyCount >= maxCount)
+						break;
+					fakeAmount -= cst.amount * struc.costMultiplier + actCount * cst.scaling;
+					if(fakeAmount <= 0)
+					{hasRes = false;}
+					else {buyCount++; actCount++;}
+				}
+				count = buyCount;
+			}else{
+				int tmpC = Mathf.FloorToInt(GM.resourceManager.GetResource (cst.resource).amount
+					/ cst.amount * struc.costMultiplier);
+				if(first){ first = false; count = tmpC; }
+				else if(tmpC < count) count = tmpC;
+			}
+		} return count;
 	}
 
 	public void BuyStructure (string structToBuy){

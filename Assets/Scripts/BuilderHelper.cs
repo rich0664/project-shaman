@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -20,6 +21,7 @@ public class BuilderHelper : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		CheckClick();
+		CheckTouchHold();
 	}
 
 	void QuickBuild(){
@@ -39,6 +41,54 @@ public class BuilderHelper : MonoBehaviour {
 		if(GM.uiManager.toolTip.name == "QuickBuildTooltip"){
 			GM.uiManager.KillTooltip(true);
 		}
+	}
+
+	bool isHeld = false;
+	float startTouchTime = 0f;
+	public void InitialTouch(){
+		isHeld = true;
+		startTouchTime = Time.time;
+	}
+
+	public void ExitTouch (){
+		isHeld = false;
+	}
+
+	public void ClickBuild(){
+		isHeld = false;
+		BatchBuild(GM.uiManager.lastTooltip, 
+		           (int)GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value,
+		           Vector3.zero);
+	}
+
+	void CheckTouchHold(){
+		if(isHeld)
+			if(Time.time - startTouchTime > 1f){				
+				isHeld = false;
+				if(GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value == 0f)
+					return;
+				StartCoroutine(ManualPlace());
+			}
+	}
+
+	[HideInInspector] public bool isPlacing = false;
+	IEnumerator ManualPlace(){
+		int tmpAmount = (int)GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value;
+		isPlacing = true; GM.uiManager.ToggleMenu("Structures"); GM.paused = true;
+		GM.gameCamera.distance = 1000f;	GM.gameCamera.ReCenterCamera();
+		GameObject targeter = GameObject.Find("WorldCanvas").transform.Find("BuildTargeter").gameObject;
+		targeter.SetActive(true); string toBuild = GM.uiManager.lastTooltip;
+		targeter.transform.Find("StructIcon").GetComponent<Image>().sprite = Resources.Load<Sprite> ("BuildingIcons/" + toBuild);
+		while(Input.GetMouseButton(0)){
+			yield return new WaitForEndOfFrame();
+			Ray rayy = Camera.main.ScreenPointToRay(Input.mousePosition); RaycastHit hitt;
+			if(Physics.Raycast(rayy, out hitt))
+				targeter.transform.position = hitt.point;
+		}
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); RaycastHit hit;
+		if(Physics.Raycast(ray, out hit))
+			BatchBuild(toBuild, tmpAmount, hit.point);
+		isPlacing = false; GM.paused = false; targeter.SetActive(false);
 	}
 
 	public void BatchBuild(string toBuild, int buildCount, Vector3 buildCenter){
@@ -87,8 +137,6 @@ public class BuilderHelper : MonoBehaviour {
 			if(prevPos != Input.mousePosition)
 				return;
 		}
-		Vector3 rayPos = Vector3.zero;
-		rayPos = Input.mousePosition;
 
 		if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()){
 			if(GM.uiManager.toolTip){
@@ -98,7 +146,7 @@ public class BuilderHelper : MonoBehaviour {
 		}else{
 			return;
 		}
-		Ray ray = Camera.main.ScreenPointToRay(rayPos);
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if(Physics.Raycast(ray, out hit)){
 			if(!hit.transform.GetComponent<Spot>()){

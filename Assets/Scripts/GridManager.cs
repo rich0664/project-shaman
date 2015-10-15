@@ -30,6 +30,11 @@ public class GridManager : MonoBehaviour {
 		}
 	}
 
+	public void AdjustFoliageDensity(float amount){
+		foliageCount = (int)(amount + expandAt * rings);
+		ProcessFoliage();
+	}
+
 	void ProcessFoliage(){
 		if(GameObject.Find("Foliage"))
 		   Destroy(GameObject.Find("Foliage"));
@@ -41,18 +46,27 @@ public class GridManager : MonoBehaviour {
 		for(int i = 0; i < foliageCount; i++){
 			GameObject treeInst = GameObject.Instantiate(shrubPref);
 			treeInst.transform.SetParent(foliageParent.transform);
-			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(11.5f, 30.5f));
-			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-4.0f, 4.0f));
+			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(11.5f, 41.5f));
+			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-6.0f, 6.0f));
 			treeInst.transform.localScale *= Random.Range(0.4f, 1.1f);
+		}
+		int treeIT = foliageCount/2;
+		for(int i = 0; i < treeIT; i++){
+			GameObject treeInst = GameObject.Instantiate(treePref);
+			treeInst.transform.SetParent(foliageParent.transform);
+			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(14f, 34.5f));
+			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / treeIT) * i + Random.Range(-6.0f, 6.0f));
+			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
 		}
 		for(int i = 0; i < foliageCount; i++){
 			GameObject treeInst = GameObject.Instantiate(treePref);
 			treeInst.transform.SetParent(foliageParent.transform);
-			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(14.5f, 40.5f));
-			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-4.0f, 4.0f));
+			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(35.5f, 60.5f));
+			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-10.0f, 10.0f));
 			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
 		}
-		foliageCount += (int)expandIncrement;
+
+		foliageCount += expandAt;
 	}
 
 	void Expand(){

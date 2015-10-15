@@ -41,9 +41,10 @@ public class GameManager : MonoBehaviour {
 
 	float delay = 0.1f;
 	IEnumerator GameLoop (){
-		while(!paused) {
+		while(true) {
 			yield return new WaitForSeconds (delay);
-			
+			if(paused)
+				continue;
 			foreach(ResourceManager.Resource res in resourceManager.resources) {
 				res.sumStorage = res.baseStorage;
 				res.contributors.activeProduction = 0f;

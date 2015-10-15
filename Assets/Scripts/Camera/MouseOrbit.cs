@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 [AddComponentMenu("Camera-Control/Mouse Orbit with zoom")]
@@ -21,6 +22,7 @@ public class MouseOrbit : MonoBehaviour
 	float x = 0.0f;
 	float y = 0.0f;
 	GameManager GM;
+	Toggle invertPan;
 	
 	// Use this for initialization
 	void Start ()
@@ -34,6 +36,7 @@ public class MouseOrbit : MonoBehaviour
 			GetComponent<Rigidbody> ().freezeRotation = true;
 
 		GM = GameObject.Find ("Management").GetComponent<GameManager> ();
+		invertPan = GameObject.Find ("UICanvas").transform.Find("GameMenu/InvertPan").GetComponent<Toggle>();
 	}
 
 	public void ExpandDistance (float expInc)
@@ -62,6 +65,10 @@ public class MouseOrbit : MonoBehaviour
 	}
 	*/
 
+	public void ReCenterCamera(){
+		targOffset = Vector3.zero;
+	}
+
 	void FixOffset ()
 	{
 		float limit = offsetLimit;
@@ -76,49 +83,70 @@ public class MouseOrbit : MonoBehaviour
 	{
 		if (target) {
 
+			float zoomMult = distance / distanceMin;
 			if (!GM.uiManager.isMenu) {
 				if (Input.GetMouseButton (1) && Input.touchCount == 0) {
 					x += Input.GetAxis ("Mouse X") * xSpeed * distance * 0.02f;
 					y -= Input.GetAxis ("Mouse Y") * ySpeed * 0.02f;
 					y = ClampAngle (y, yMinLimit, yMaxLimit);
 				}
-				if(Input.touchCount == 1){
-					Vector2 tdp = Input.GetTouch (0).deltaPosition;
-					//tdp = tdp * (Time.deltaTime / Input.GetTouch (0).deltaTime);
-					x += (tdp.x / Screen.width) * xSpeed * distance * 12.75f;
-					y -= (tdp.y / Screen.height) * ySpeed * 12.75f;
-					y = ClampAngle (y, yMinLimit, yMaxLimit);
-					//Debug.Log(Input.GetTouch (0).deltaPosition * (Time.deltaTime / Input.GetTouch (0).deltaTime)
-					     //     - Input.GetTouch (0).deltaPosition);
-					//Debug.Log(Input.GetTouch (0).deltaPosition);
-				}
-
-				if (Input.GetMouseButton (0) && Input.touchCount == 0) {
-					targOffset += transform.right * Input.GetAxis ("Mouse X") * 0.2f;
-					targOffset += transform.forward * Input.GetAxis ("Mouse Y") * 0.2f;
-				}
-				if (Input.touchCount == 2) {
-					Touch touchZero = Input.GetTouch (0);
-					Touch touchOne = Input.GetTouch (1);
-					Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
-					Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
-					float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-					float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
-					float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
-					Vector2 midTouch = (touchZero.position + touchOne.position) * 0.5f;
-					Vector2 prevMidTouch = (touchZeroPrevPos + touchOnePrevPos) * 0.5f;
-					Vector2 deltaMid = midTouch - prevMidTouch;
-
-					targOffset += transform.right * deltaMid.x * 0.45f;
-					targOffset += transform.forward * deltaMid.y * 0.45f;
-					distance = Mathf.Clamp (distance + deltaMagnitudeDiff * 2.8f, distanceMin, distanceMax);
+				if(!GM.builderHelper.isPlacing){
+					if (Input.GetMouseButton (0) && Input.touchCount == 0) {
+						float dirMult = 1f;
+						if(invertPan.isOn)
+							dirMult = -dirMult;
+						float panSpeed = 0.2f * zoomMult;
+						targOffset += transform.right * -Input.GetAxis ("Mouse X") * panSpeed * dirMult;
+						targOffset += transform.forward * -Input.GetAxis ("Mouse Y") * panSpeed * dirMult;
+					}
+					if(Input.touchCount == 1){
+						Vector2 tdp = Input.GetTouch (0).deltaPosition;
+						x += (tdp.x / Screen.width) * xSpeed * distance * 12.75f;
+						y -= (tdp.y / Screen.height) * ySpeed * 12.75f;
+						y = ClampAngle (y, yMinLimit, yMaxLimit);
+					}
+					if (Input.touchCount == 2) {
+						float panSpeed = 0.4f * zoomMult;
+						float zoomSpeed = 2.75f * zoomMult;
+						float dirMult = 1f;
+						if(invertPan.isOn)
+							dirMult = -dirMult;
+						Touch touchZero = Input.GetTouch (0);
+						Touch touchOne = Input.GetTouch (1);
+						Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+						Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+						float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+						float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+						float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+						Vector2 midTouch = (touchZero.position + touchOne.position) * 0.5f;//midpoints
+						Vector2 prevMidTouch = (touchZeroPrevPos + touchOnePrevPos) * 0.5f;
+						Vector2 deltaMid = midTouch - prevMidTouch;
+					
+						targOffset += transform.right * -deltaMid.x * panSpeed * dirMult;
+						targOffset += transform.forward * -deltaMid.y * panSpeed * dirMult;
+						distance = Mathf.Clamp (distance + deltaMagnitudeDiff * zoomSpeed, distanceMin, distanceMax);
+					}
+				}else{
+					if(Input.touchCount == 1){
+						float panSpeed = 0.4f * zoomMult;
+						Touch touchZero = Input.GetTouch (0);
+						targOffset += transform.right * touchZero.deltaPosition.x * panSpeed;
+						targOffset += transform.forward * touchZero.deltaPosition.y * panSpeed;
+					}
+					if (Input.GetMouseButton (0) && Input.touchCount == 0) {
+						float panSpeed = 0.2f * zoomMult;
+						targOffset += transform.right * Input.GetAxis ("Mouse X") * panSpeed;
+						targOffset += transform.forward * Input.GetAxis ("Mouse Y") * panSpeed;
+					}
 				}
 			}
 			
 			Quaternion rotation = Quaternion.Euler (y, x, 0);
 			
-			if (!GM.uiManager.isMenu)
-				distance = Mathf.Clamp (distance - Input.GetAxis ("Mouse ScrollWheel") * zoomSpeed, distanceMin, distanceMax);
+			if (!GM.uiManager.isMenu){
+				float zS = zoomSpeed * zoomMult;
+				distance = Mathf.Clamp (distance - Input.GetAxis ("Mouse ScrollWheel") * zS, distanceMin, distanceMax);
+			}
 				
 			FixOffset ();
 			//RaycastHit hit;
