@@ -24,23 +24,32 @@ public class BuilderHelper : MonoBehaviour {
 		CheckTouchHold();
 	}
 
-	void QuickBuild(){
-		GM.uiManager.QuickBuildTooltip();
-	}
-
-	public void BuildOnSpot(string typeToBuild){
-		GameObject buildInst = GameObject.Instantiate(Resources.Load<GameObject>("BuildingPrefabs/" + typeToBuild));
-		buildInst.transform.SetParent(lastSpot.transform);
-		buildInst.transform.localPosition = Vector3.zero;
-		//buildInst.transform.localScale = Vector3.one;
-		buildInst.GetComponent<PhysicalStructure>().structure = GM.structureManager.GetStructure(typeToBuild);
-		pStructList.Add(buildInst.GetComponent<PhysicalStructure>());
+	public void QuickBuild(string typeToBuild){
 		GM.structureManager.BuyStructure(typeToBuild);
-		lastSpot.filled = true;
+		BuildOnSpot(typeToBuild);
 		if(GM.uiManager.toolTip)
 		if(GM.uiManager.toolTip.name == "QuickBuildTooltip"){
 			GM.uiManager.KillTooltip(true);
 		}
+	}
+
+	public void BuildOnSpot(string typeToBuild){
+		GameObject buildInst = GameObject.Instantiate(Resources.Load<GameObject>("BuildingPrefabs/Construction"));
+		GameObject timerInst = GameObject.Instantiate(GameObject.Find("WorldCanvasOcc").transform.Find("Templates/ConstructionTimer").gameObject);
+		timerInst.transform.SetParent(GameObject.Find("WorldCanvasOcc").transform);
+		timerInst.transform.localScale = Vector3.one;
+		timerInst.transform.position = lastSpot.transform.position;
+		buildInst.transform.SetParent(lastSpot.transform);
+		buildInst.transform.localPosition = Vector3.zero;
+		//buildInst.transform.localScale = Vector3.one;
+		PhysicalStructure pStruct = buildInst.GetComponent<PhysicalStructure>();
+		pStruct.structure = GM.structureManager.GetStructure(typeToBuild);
+		pStruct.GM = GM;
+		pStruct.constructTimer = timerInst;
+		pStructList.Add(pStruct);
+		//GM.structureManager.BuyStructure(typeToBuild);
+		lastSpot.filled = true;
+		pStruct.StartConstruct();
 	}
 
 	bool isHeld = false;
@@ -56,9 +65,9 @@ public class BuilderHelper : MonoBehaviour {
 
 	public void ClickBuild(){
 		isHeld = false;
-		BatchBuild(GM.uiManager.lastTooltip, 
+		StartCoroutine(BatchBuild(GM.uiManager.lastTooltip, 
 		           (int)GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value,
-		           Vector3.zero);
+		           Vector3.zero));
 	}
 
 	void CheckTouchHold(){
@@ -87,13 +96,17 @@ public class BuilderHelper : MonoBehaviour {
 		}
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); RaycastHit hit;
 		if(Physics.Raycast(ray, out hit))
-			BatchBuild(toBuild, tmpAmount, hit.point);
+			StartCoroutine(BatchBuild(toBuild, tmpAmount, hit.point));
 		isPlacing = false; GM.paused = false; targeter.SetActive(false);
 	}
 
-	public void BatchBuild(string toBuild, int buildCount, Vector3 buildCenter){
+	IEnumerator BatchBuild(string toBuild, int buildCount, Vector3 buildCenter){
 		RefreshEmptySpots();
 		for(int i = 0; i < buildCount; i++){
+			GM.structureManager.BuyStructure(toBuild);
+		}
+		for(int i = 0; i < buildCount; i++){
+			yield return new WaitForSeconds(0.1f);
 			lastSpot = GetClosestSpot(buildCenter);
 			BuildOnSpot(toBuild);
 		}
@@ -156,7 +169,7 @@ public class BuilderHelper : MonoBehaviour {
 			}
 			//Debug.Log(hit.collider.gameObject);
 			if(!lastSpot.filled){
-				QuickBuild();
+				GM.uiManager.QuickBuildTooltip();
 			}else{
 				GM.uiManager.StructInfo(lastSpot.GetComponentInChildren<PhysicalStructure>().structure.name);
 			}

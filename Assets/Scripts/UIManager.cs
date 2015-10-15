@@ -136,7 +136,7 @@ public class UIManager : MonoBehaviour
 			//buyBtn.interactable = GM.structureManager.CanBuyStructure(struc);
 
 			Text nameText = tmpStrucUI.transform.Find ("Struct/Text").GetComponent<Text> ();
-			nameText.text = struc.name + " (" + struc.amount + ")";
+			nameText.text = struc.name + " (" + struc.activeAmount + "/" + struc.amount + ")";
 		}
 	}
 
@@ -228,7 +228,7 @@ public class UIManager : MonoBehaviour
 				icoInst.transform.Find ("Image").GetComponent<Image> ().sprite = strucIcon;
 				Button button = icoInst.transform.Find ("Image").GetComponent<Button> ();
 				button.onClick.AddListener (delegate {
-					GM.builderHelper.BuildOnSpot (tmpStruc.name);
+					GM.builderHelper.QuickBuild (tmpStruc.name);
 				});
 				couldBuyList.Add (tmpStruc.name);
 				count++;

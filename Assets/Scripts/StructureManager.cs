@@ -12,6 +12,7 @@ public class StructureManager : MonoBehaviour {
 		public List<Cost> costs;
 
 		[Header("MiscSettings")]
+		public float constructTime = 1f;
 		public float costMultiplier = 1f;
 		public float multiplier = 1f;
 		public bool discovered;
@@ -96,6 +97,10 @@ public class StructureManager : MonoBehaviour {
 		foreach(Cost cst in struc.costs)
 			GM.resourceManager.GetResource (cst.resource).amount -= (cst.amount * struc.costMultiplier) + (struc.amount * cst.scaling);
 		struc.amount++;
+	}
+
+	public void BuildStructure(string structToBuy){
+		Structure struc = GetStructure (structToBuy);
 		struc.activeAmount++;
 		foreach(Effect effct in struc.effects) {
 			int enumIndex = (int)effct.effectType;
@@ -103,28 +108,28 @@ public class StructureManager : MonoBehaviour {
 			if(effct.effectTarget == Effect.targetMode.Resource) {
 				ResourceManager.Resource tmpRes = GM.resourceManager.GetResource (effct.targetName);
 				switch (enumIndex) {
-					case 1: //Produce
-						tmpRes.contributors.baseProduction += tmpEffectValue * struc.multiplier;
-						break;
-					case 2: //Multiply
-						tmpRes.contributors.structureMult += tmpEffectValue * struc.multiplier;
-						break;
+				case 1: //Produce
+					tmpRes.contributors.baseProduction += tmpEffectValue * struc.multiplier;
+					break;
+				case 2: //Multiply
+					tmpRes.contributors.structureMult += tmpEffectValue * struc.multiplier;
+					break;
 				}
 			} else if(effct.effectTarget == Effect.targetMode.Structure) {
 				StructureManager.Structure tmpStruc = GM.structureManager.GetStructure (effct.targetName);
 				switch (enumIndex) {
-					case 2: //Multiply
-						tmpStruc.multiplier += tmpEffectValue * struc.multiplier;
-						break;
-					case 4: //Cost
-						tmpStruc.costMultiplier += tmpEffectValue * struc.multiplier;
-						break;
-					case 5: //ActiveCost
-						tmpStruc.activeCostMult += tmpEffectValue * struc.multiplier;
-						break;
-					case 6: //ActiveMult
-						tmpStruc.activeMult += tmpEffectValue * struc.multiplier;
-						break;
+				case 2: //Multiply
+					tmpStruc.multiplier += tmpEffectValue * struc.multiplier;
+					break;
+				case 4: //Cost
+					tmpStruc.costMultiplier += tmpEffectValue * struc.multiplier;
+					break;
+				case 5: //ActiveCost
+					tmpStruc.activeCostMult += tmpEffectValue * struc.multiplier;
+					break;
+				case 6: //ActiveMult
+					tmpStruc.activeMult += tmpEffectValue * struc.multiplier;
+					break;
 				}
 			}
 		}

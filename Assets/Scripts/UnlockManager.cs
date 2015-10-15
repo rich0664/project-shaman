@@ -31,8 +31,10 @@ public class UnlockManager : MonoBehaviour {
 	}
 
 	IEnumerator UnlockLoop(){
-		while(!GM.paused){
+		while(true){
 			yield return new WaitForSeconds(1.0f);
+			if(GM.paused)
+				continue;
 			CheckUnlocks();
 		}
 	}
