@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
 	public bool paused = false;
 	public float ticks = 10f;
 
-
+	public SaveLoad saveLoad;
 	public ResourceManager resourceManager;
 	public StructureManager structureManager;
 	public UIManager uiManager;
@@ -14,11 +14,13 @@ public class GameManager : MonoBehaviour {
 	public UnlockManager unlockManager;
 	public BuilderHelper builderHelper;
 	public MouseOrbit gameCamera;
+	public FrontFaceManager ffManager;
 
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
 		Application.targetFrameRate = 30;
 
+		saveLoad = GetComponent<SaveLoad> ();
 		resourceManager = GetComponent<ResourceManager> ();
 		structureManager = GetComponent<StructureManager> ();
 		uiManager = GetComponent<UIManager>();
@@ -26,6 +28,7 @@ public class GameManager : MonoBehaviour {
 		unlockManager = GetComponent<UnlockManager>();
 		builderHelper = GetComponent<BuilderHelper>();
 		gameCamera = Camera.main.GetComponent<MouseOrbit>();
+		ffManager = Camera.main.GetComponent<FrontFaceManager>();
 
 		LoadSequence();
 
@@ -49,11 +52,12 @@ public class GameManager : MonoBehaviour {
 				res.sumStorage = res.baseStorage;
 				res.contributors.activeProduction = 0f;
 			}
-			foreach(ResourceManager.Resource res in resourceManager.resources)
-				resourceManager.DoTick(res);
 			foreach(StructureManager.Structure struc in structureManager.structures)
 				if(!struc.passiveStructure)
 					structureManager.DoTick (struc);
+			foreach(ResourceManager.Resource res in resourceManager.resources)
+				resourceManager.DoTick(res);
+
 		
 			uiManager.UpdateUI();
 		}

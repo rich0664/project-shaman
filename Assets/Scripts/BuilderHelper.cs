@@ -41,14 +41,14 @@ public class BuilderHelper : MonoBehaviour {
 		timerInst.transform.position = lastSpot.transform.position;
 		buildInst.transform.SetParent(lastSpot.transform);
 		buildInst.transform.localPosition = Vector3.zero;
+		buildInst.transform.GetChild(0).rotation = Camera.main.transform.rotation;
 		//buildInst.transform.localScale = Vector3.one;
 		PhysicalStructure pStruct = buildInst.GetComponent<PhysicalStructure>();
 		pStruct.structure = GM.structureManager.GetStructure(typeToBuild);
 		pStruct.GM = GM;
 		pStruct.constructTimer = timerInst;
 		pStructList.Add(pStruct);
-		//GM.structureManager.BuyStructure(typeToBuild);
-		lastSpot.filled = true;
+		GM.ffManager.updateList.Add(pStruct.transform.GetChild(0));
 		pStruct.StartConstruct();
 	}
 
@@ -84,7 +84,7 @@ public class BuilderHelper : MonoBehaviour {
 	IEnumerator ManualPlace(){
 		int tmpAmount = (int)GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value;
 		isPlacing = true; GM.uiManager.ToggleMenu("Structures"); GM.paused = true;
-		GM.gameCamera.distance = 1000f;	GM.gameCamera.ReCenterCamera();
+		GM.gameCamera.targetDistance = 1000f;	GM.gameCamera.ReCenterCamera();
 		GameObject targeter = GameObject.Find("WorldCanvas").transform.Find("BuildTargeter").gameObject;
 		targeter.SetActive(true); string toBuild = GM.uiManager.lastTooltip;
 		targeter.transform.Find("StructIcon").GetComponent<Image>().sprite = Resources.Load<Sprite> ("BuildingIcons/" + toBuild);
@@ -102,12 +102,16 @@ public class BuilderHelper : MonoBehaviour {
 
 	IEnumerator BatchBuild(string toBuild, int buildCount, Vector3 buildCenter){
 		RefreshEmptySpots();
+		List<Spot> batchSpots = new List<Spot>();
 		for(int i = 0; i < buildCount; i++){
 			GM.structureManager.BuyStructure(toBuild);
+			Spot tmpSpot = GetClosestSpot(buildCenter);
+			batchSpots.Add(tmpSpot);
+			tmpSpot.filled = true;
 		}
 		for(int i = 0; i < buildCount; i++){
 			yield return new WaitForSeconds(0.1f);
-			lastSpot = GetClosestSpot(buildCenter);
+			lastSpot = batchSpots[i];
 			BuildOnSpot(toBuild);
 		}
 	}
@@ -146,9 +150,12 @@ public class BuilderHelper : MonoBehaviour {
 			return;
 		}
 		if(wasClick && Input.GetMouseButtonUp(0)){
-			wasClick = false;
-			if(prevPos != Input.mousePosition)
+			wasClick = false; float leniency = 6f;
+			if(Mathf.Clamp(prevPos.x, Input.mousePosition.x - leniency, Input.mousePosition.x + leniency) != prevPos.x){
 				return;
+			}else if(Mathf.Clamp(prevPos.y, Input.mousePosition.y - leniency, Input.mousePosition.y + leniency) != prevPos.y){
+				return;
+			}
 		}
 
 		if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()){
