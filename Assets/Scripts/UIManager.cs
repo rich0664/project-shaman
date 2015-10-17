@@ -228,7 +228,7 @@ public class UIManager : MonoBehaviour
 				icoInst.transform.Find ("Image").GetComponent<Image> ().sprite = strucIcon;
 				Button button = icoInst.transform.Find ("Image").GetComponent<Button> ();
 				button.onClick.AddListener (delegate {
-					GM.builderHelper.QuickBuild (tmpStruc.name);
+					GM.builderHelper.QuickBuild (tmpStruc.name, false);
 				});
 				couldBuyList.Add (tmpStruc.name);
 				count++;

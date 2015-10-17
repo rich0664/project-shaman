@@ -13,10 +13,11 @@ public class GridManager : MonoBehaviour {
 	GameManager GM;
 	GameObject spotPref;
 	GameObject ringParent;
+	GameObject foliageParent;
 	float rotat = 0f;
+	int spotCount = 0;
 
-
-	void Start(){
+	public void StartUp(){
 		//StartCoroutine(TestLoop());
 		spotPref = Resources.Load<GameObject>("BuildingPrefabs/Spot");
 		ringParent = new GameObject(); ringParent.name = "Rings";
@@ -35,11 +36,11 @@ public class GridManager : MonoBehaviour {
 		ProcessFoliage();
 	}
 
-	void ProcessFoliage(){
-		if(GameObject.Find("Foliage"))
-		   Destroy(GameObject.Find("Foliage"));
+	public void ProcessFoliage(){
+		if(foliageParent)
+			Destroy(foliageParent);
 
-		GameObject foliageParent = new GameObject();
+		foliageParent = new GameObject();
 		foliageParent.name = "Foliage";
 		GameObject treePref = Resources.Load<GameObject>("BuildingPrefabs/Tree");
 		GameObject shrubPref = Resources.Load<GameObject>("BuildingPrefabs/Shrub");
@@ -87,10 +88,12 @@ public class GridManager : MonoBehaviour {
 		GameObject Ring = new GameObject();
 		Ring.name = "Ring" + (rings + 1); Ring.transform.SetParent(ringParent.transform);
 		for(int i = 0; i < spots; i++){
+			spotCount++;
 			GameObject spotInst = GameObject.Instantiate(spotPref);
 			spotInst.transform.SetParent(Ring.transform);
 			spotInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + 7f);
 			spotInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / spots) * i);
+			spotInst.name = spotCount.ToString();
 			GM.builderHelper.spotList.Add(spotInst.GetComponent<Spot>());
 		}
 		ProcessFoliage();

@@ -30,10 +30,14 @@ public class GameManager : MonoBehaviour {
 		gameCamera = Camera.main.GetComponent<MouseOrbit>();
 		ffManager = Camera.main.GetComponent<FrontFaceManager>();
 
-		LoadSequence();
-
 		resourceManager.StartUp ();
 		structureManager.StartUp ();
+		gridManager.StartUp();
+		builderHelper.StartUp();
+
+		saveLoad.StartUp();
+		saveLoad.Load(false);
+
 		unlockManager.StartUp();
 		uiManager.StartUp();
 		uiManager.UpdateUI();

@@ -8,13 +8,13 @@ public class BuilderHelper : MonoBehaviour {
 	GameManager GM;
 	bool wasClick = false;
 	Vector3 prevPos;
-	Spot lastSpot;
+	[HideInInspector] public Spot lastSpot;
 	[HideInInspector] public List<Spot> spotList;
 	[HideInInspector] public List<Spot> emptySpots;
 	[HideInInspector] public List<PhysicalStructure> pStructList;
 
 	// Use this for initialization
-	void Start () {
+	public void StartUp () {
 		GM = GetComponent<GameManager>();
 	}
 	
@@ -24,16 +24,18 @@ public class BuilderHelper : MonoBehaviour {
 		CheckTouchHold();
 	}
 
-	public void QuickBuild(string typeToBuild){
-		GM.structureManager.BuyStructure(typeToBuild);
-		BuildOnSpot(typeToBuild);
+	public void QuickBuild(string typeToBuild, bool instant){
+		if(!instant)
+			GM.structureManager.BuyStructure(typeToBuild);
+		BuildOnSpot(typeToBuild, instant);
+		lastSpot.filled = true;
 		if(GM.uiManager.toolTip)
 		if(GM.uiManager.toolTip.name == "QuickBuildTooltip"){
 			GM.uiManager.KillTooltip(true);
 		}
 	}
 
-	public void BuildOnSpot(string typeToBuild){
+	public void BuildOnSpot(string typeToBuild, bool instant){
 		GameObject buildInst = GameObject.Instantiate(Resources.Load<GameObject>("BuildingPrefabs/Construction"));
 		GameObject timerInst = GameObject.Instantiate(GameObject.Find("WorldCanvasOcc").transform.Find("Templates/ConstructionTimer").gameObject);
 		timerInst.transform.SetParent(GameObject.Find("WorldCanvasOcc").transform);
@@ -49,6 +51,11 @@ public class BuilderHelper : MonoBehaviour {
 		pStruct.constructTimer = timerInst;
 		pStructList.Add(pStruct);
 		GM.ffManager.updateList.Add(pStruct.transform.GetChild(0));
+		if(instant){
+			pStruct.constructTime = 0f;
+		}else{
+			pStruct.constructTime = pStruct.structure.constructTime;
+		}
 		pStruct.StartConstruct();
 	}
 
@@ -85,16 +92,18 @@ public class BuilderHelper : MonoBehaviour {
 		int tmpAmount = (int)GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value;
 		isPlacing = true; GM.uiManager.ToggleMenu("Structures"); GM.paused = true;
 		GM.gameCamera.targetDistance = 1000f;	GM.gameCamera.ReCenterCamera();
-		GameObject targeter = GameObject.Find("WorldCanvas").transform.Find("BuildTargeter").gameObject;
+		GameObject targeter = GameObject.Find("UICanvas").transform.Find("BuildTargeter").gameObject;
 		targeter.SetActive(true); string toBuild = GM.uiManager.lastTooltip;
 		targeter.transform.Find("StructIcon").GetComponent<Image>().sprite = Resources.Load<Sprite> ("BuildingIcons/" + toBuild);
 		while(Input.GetMouseButton(0)){
 			yield return new WaitForEndOfFrame();
-			Ray rayy = Camera.main.ScreenPointToRay(Input.mousePosition); RaycastHit hitt;
+			Vector3 modMousePos = Input.mousePosition + new Vector3(0f,60f,0f);
+			Ray rayy = Camera.main.ScreenPointToRay(modMousePos); RaycastHit hitt;
 			if(Physics.Raycast(rayy, out hitt))
-				targeter.transform.position = hitt.point;
+				targeter.transform.position = modMousePos;
+				//targeter.transform.position = hitt.point;
 		}
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition + new Vector3(0f,60f,0f)); RaycastHit hit;
 		if(Physics.Raycast(ray, out hit))
 			StartCoroutine(BatchBuild(toBuild, tmpAmount, hit.point));
 		isPlacing = false; GM.paused = false; targeter.SetActive(false);
@@ -112,7 +121,7 @@ public class BuilderHelper : MonoBehaviour {
 		for(int i = 0; i < buildCount; i++){
 			yield return new WaitForSeconds(0.1f);
 			lastSpot = batchSpots[i];
-			BuildOnSpot(toBuild);
+			BuildOnSpot(toBuild, false);
 		}
 	}
 
