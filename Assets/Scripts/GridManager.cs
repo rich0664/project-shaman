@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour {
 
@@ -16,7 +17,8 @@ public class GridManager : MonoBehaviour {
 	GameObject foliageParent;
 	float rotat = 0f;
 	int spotCount = 0;
-
+	[HideInInspector] public List<Transform> foliages;
+	
 	public void StartUp(){
 		//StartCoroutine(TestLoop());
 		spotPref = Resources.Load<GameObject>("BuildingPrefabs/Spot");
@@ -40,38 +42,36 @@ public class GridManager : MonoBehaviour {
 		if(foliageParent)
 			Destroy(foliageParent);
 
+		foliages.Clear();
+		foliages = new List<Transform>();
 		foliageParent = new GameObject();
 		foliageParent.name = "Foliage";
 		GameObject treePref = Resources.Load<GameObject>("BuildingPrefabs/Tree");
 		GameObject shrubPref = Resources.Load<GameObject>("BuildingPrefabs/Shrub");
-		float folDir = 20f;
 		for(int i = 0; i < foliageCount; i++){
-			if(Random.Range(0,2) == 1)	folDir = -folDir;
 			GameObject treeInst = GameObject.Instantiate(shrubPref);
 			treeInst.transform.SetParent(foliageParent.transform);
 			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(11.5f, 41.5f));
 			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-6.0f, 6.0f));
 			treeInst.transform.localScale *= Random.Range(0.4f, 1.1f);
-			treeInst.transform.localEulerAngles += new Vector3(folDir,0f,0f);
+			foliages.Add(treeInst.transform);
 		}
 		int treeIT = foliageCount/2;
 		for(int i = 0; i < treeIT; i++){
-			if(Random.Range(0,2) == 1)	folDir = -folDir;
 			GameObject treeInst = GameObject.Instantiate(treePref);
 			treeInst.transform.SetParent(foliageParent.transform);
 			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(14f, 34.5f));
 			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / treeIT) * i + Random.Range(-6.0f, 6.0f));
 			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
-			treeInst.transform.localEulerAngles += new Vector3(folDir,0f,0f);
+			foliages.Add(treeInst.transform);
 		}
 		for(int i = 0; i < foliageCount; i++){
-			if(Random.Range(0,2) == 1)	folDir = -folDir;
 			GameObject treeInst = GameObject.Instantiate(treePref);
 			treeInst.transform.SetParent(foliageParent.transform);
 			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(35.5f, 60.5f));
 			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-10.0f, 10.0f));
 			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
-			treeInst.transform.localEulerAngles += new Vector3(folDir,0f,0f);
+			foliages.Add(treeInst.transform);
 		}
 
 		foliageCount += 8;

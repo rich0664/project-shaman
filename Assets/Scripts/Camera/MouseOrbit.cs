@@ -173,7 +173,7 @@ public class MouseOrbit : MonoBehaviour
 					}
 				}
 			}
-			yMinLimit = Mathf.SmoothStep(yMinLimit, 2.3f * zoomMult + 1.7f, Time.deltaTime * 10f);
+			yMinLimit = Mathf.SmoothStep(yMinLimit, 2f * zoomMult + 0.1f, Time.deltaTime * 10f);
 			y = ClampAngle (y, yMinLimit, yMaxLimit);
 			Quaternion rotation = Quaternion.Euler (y, x, 0);
 			

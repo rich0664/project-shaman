@@ -30,6 +30,8 @@ public class FrontFaceManager : MonoBehaviour {
 				rot = camT.rotation; delayer = 0;
 				foreach(Transform tr in updateList)
 					tr.rotation = rot;
+				foreach(Transform tr in GM.gridManager.foliages)
+					tr.rotation = rot;
 			}
 		}
 	}

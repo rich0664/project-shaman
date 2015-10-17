@@ -139,6 +139,11 @@ public class SaveLoad : MonoBehaviour
 	}
 
 
+	public void RESET(){
+		PlayerPrefs.DeleteKey("SaveData");
+		PlayerPrefs.Save();
+		Application.LoadLevel("Main");
+	}
 
 	string SaveString(string name, string value){
 		return "<" + name + ">" + value + "</" + name + ">";
