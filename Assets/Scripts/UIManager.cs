@@ -86,18 +86,15 @@ public class UIManager : MonoBehaviour
 		canvasObj.transform.Find (str).gameObject.SetActive (isMenu);
 		if (str == "Structures") {
 			if (isMenu){
-				StructureTooltip ("Drug Farm");
-			}else{
-				KillTooltip(true);
+				StructureTooltip ("BerryA Farm");
+				return;
 			}
 		} else if (str == "Leadership") {
 			MES.SetSelectedGameObject (
 				canvasObj.transform.Find (str + "/Tabs/Resources/Button").gameObject);
-				KillTooltip(true);
-		} else if (str == "GameMenu") {
-			KillTooltip(true);
 		}
-		ShamanMenu.SetActive (!isMenu); 
+		KillTooltip(true);
+		ShamanMenu.SetActive (!isMenu);
 	}
 
 	void UpdateResources ()
@@ -113,7 +110,7 @@ public class UIManager : MonoBehaviour
 				items++;
 			Text nameText = tmpResUI.transform.Find ("Name").GetComponent<Text> ();
 			nameText.color = res.dispColor;
-			nameText.text = res.name + ": ";
+			nameText.text = res.displayName + ": ";
 			Text amountText = tmpResUI.transform.Find ("Amount").GetComponent<Text> ();
 			amountText.text = res.amount.ToString ("F2") + "/" + res.sumStorage;
 			Text rateText = tmpResUI.transform.Find ("Rate").GetComponent<Text> ();
@@ -136,7 +133,7 @@ public class UIManager : MonoBehaviour
 			//buyBtn.interactable = GM.structureManager.CanBuyStructure(struc);
 
 			Text nameText = tmpStrucUI.transform.Find ("Struct/Text").GetComponent<Text> ();
-			nameText.text = struc.name + " (" + struc.activeAmount + "/" + struc.amount + ")";
+			nameText.text = struc.displayName + " (" + struc.activeAmount + "/" + struc.amount + ")";
 		}
 	}
 

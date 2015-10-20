@@ -7,6 +7,12 @@ public class ResourceManager : MonoBehaviour
 	[System.Serializable]
 	public class Resource {
 		public string name;
+		public string displayName;
+		public enum resourceMode{
+			Resource = 1,
+			Food = 2
+		}
+		public resourceMode resourceType;
 		public float amount;
 		public Contributors contributors;
 		public float sumStorage;
@@ -16,11 +22,33 @@ public class ResourceManager : MonoBehaviour
 	}
 
 	public void DoTick (Resource res){
-		res.amount += (res.contributors.combinedProduction() / GM.ticks) * res.contributors.combinedMult();
-		res.amount = Mathf.Clamp(res.amount, 0f, res.sumStorage);
+		float tmpAmnt = (res.contributors.combinedProduction() / GM.ticks) * res.contributors.combinedMult();
+		int enumIndex = (int)res.resourceType;
+		switch (enumIndex) {
+		case 1: //Resource
+			res.amount += tmpAmnt;
+			res.amount = Mathf.Clamp(res.amount, 0f, res.sumStorage);
+			break;
+		case 2: //Food
+			AddFood(res, tmpAmnt);
+			break;
+		}
+	}
+
+	public void AddFood(Resource foodSource, float amount){
+		if(foodMaster.amount + amount <= foodMaster.sumStorage){
+			foodSource.amount += amount;
+			foodMaster.amount += amount;
+			foodSource.amount = Mathf.Clamp(foodSource.amount, 0f, foodMaster.sumStorage);
+		}else{
+			foodSource.amount += foodMaster.sumStorage - foodMaster.amount;
+			foodMaster.amount += foodMaster.sumStorage - foodMaster.amount;
+		}
 	}
 
 	public List<Resource> resources;
+	[HideInInspector] public Resource foodMaster;
+
 	GameManager GM;
 	Dictionary<string, Resource> resourceDictionary;
 
@@ -34,7 +62,7 @@ public class ResourceManager : MonoBehaviour
 		resourceDictionary = new Dictionary<string, Resource>();
 		foreach(Resource res in resources)
 			resourceDictionary[res.name] = res;
-
+		foodMaster = GetResource("Food");
 	}	
 
 

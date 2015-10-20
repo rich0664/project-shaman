@@ -15,12 +15,12 @@ public class Contributors{
 	}
 
 	public float combinedProduction(){
-		return baseProduction + workerProduction;
+		return baseProduction + workerProduction + activeProduction;
 	}
 
 	public string ToRate(){
 		string tmpStr = "(";
-		float perSec = combinedProduction() * combinedMult() + activeProduction;
+		float perSec = combinedProduction() * combinedMult();
 		if(perSec == 0)
 			return "";
 		if(perSec >= 0)

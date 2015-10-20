@@ -47,8 +47,10 @@ public class UnlockManager : MonoBehaviour {
 			switch (enumIndex) {
 				case 1: //resource
 					ResourceManager.Resource targetRes = GM.resourceManager.GetResource(unlck.targetName);
-					if(targetRes.amount >= unlck.unlockAt)
+					if(targetRes.amount >= unlck.unlockAt){
 						targetRes.discovered = true;
+						unlck.unlocked = true;
+					}
 					break;
 				case 2: //structure
 					int tmpEnumIndex = (int)unlck.costType;

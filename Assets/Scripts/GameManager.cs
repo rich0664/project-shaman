@@ -52,24 +52,29 @@ public class GameManager : MonoBehaviour {
 			yield return new WaitForSeconds (delay);
 			if(paused)
 				continue;
+
+			resourceManager.foodMaster.amount = 0f;
 			foreach(ResourceManager.Resource res in resourceManager.resources) {
 				res.sumStorage = res.baseStorage;
 				res.contributors.activeProduction = 0f;
+
+				if(res.resourceType == ResourceManager.Resource.resourceMode.Food)
+					resourceManager.foodMaster.amount += res.amount;
 			}
 			foreach(StructureManager.Structure struc in structureManager.structures)
-				if(!struc.passiveStructure)
+				if(!struc.passiveStructure && struc.activeAmount > 0f)
 					structureManager.DoTick (struc);
 			foreach(ResourceManager.Resource res in resourceManager.resources)
 				resourceManager.DoTick(res);
-
 		
 			uiManager.UpdateUI();
 		}
 	}
 
-	public void Forage(float value){
-		ResourceManager.Resource tmpDough = resourceManager.GetResource("Dough");
-		tmpDough.amount += value;
+	public void Forage(){
+		resourceManager.AddFood(resourceManager.GetResource("BerriesA"), Random.Range(0.5f, 5f));
+		resourceManager.GetResource("Wood").amount += Random.Range(0.5f, 2f);
+		resourceManager.GetResource("Stone").amount += Random.Range(0.0f, 0.5f);
 	}
 
 	void LoadSequence(){

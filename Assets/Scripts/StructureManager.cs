@@ -7,6 +7,7 @@ public class StructureManager : MonoBehaviour {
 	[System.Serializable]
 	public class Structure {
 		public string name;
+		public string displayName;
 		public float amount;
 		public List<Effect> effects;
 		public List<Cost> costs;
@@ -44,7 +45,7 @@ public class StructureManager : MonoBehaviour {
 				ResourceManager.Resource tmpRes = GM.resourceManager.GetResource (effct.targetName);
 				switch (enumIndex) {
 					case 1: //Produce
-						tmpRes.amount += (effct.effectValue * struc.activeAmount / GM.ticks) * struc.activeMult;
+						//tmpRes.amount += (effct.effectValue * struc.activeAmount / GM.ticks) * struc.activeMult;
 						tmpRes.contributors.activeProduction += (effct.effectValue * struc.activeAmount) * struc.activeMult;
 						break;
 					case 3: //SumStorage

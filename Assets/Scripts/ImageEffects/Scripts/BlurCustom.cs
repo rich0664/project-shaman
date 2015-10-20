@@ -4,8 +4,8 @@ using UnityEngine;
 namespace UnityStandardAssets.ImageEffects
 {
     [ExecuteInEditMode]
-    [AddComponentMenu("Image Effects/Blur/Blur")]
-    public class Blur : MonoBehaviour
+    [AddComponentMenu("Image Effects/Blur/BlurCustom")]
+    public class BlurCustom : MonoBehaviour
     {
         /// Blur iterations - larger number means more blur.
         public int iterations = 3;
@@ -83,8 +83,8 @@ namespace UnityStandardAssets.ImageEffects
 
         // Called by the camera to apply the image effect
         void OnRenderImage (RenderTexture source, RenderTexture destination) {
-            int rtW = source.width/12;
-            int rtH = source.height/12;
+            int rtW = source.width/4;
+            int rtH = source.height/4;
             RenderTexture buffer = RenderTexture.GetTemporary(rtW, rtH, 0);
 
             // Copy source to the 4x4 smaller texture.
