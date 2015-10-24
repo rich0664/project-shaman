@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
 	public GridManager gridManager;
 	public UnlockManager unlockManager;
 	public BuilderHelper builderHelper;
+	public VillagerManager villagerManager;
 	public MouseOrbit gameCamera;
 	public FrontFaceManager ffManager;
 
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
 		gridManager = GetComponent<GridManager>();
 		unlockManager = GetComponent<UnlockManager>();
 		builderHelper = GetComponent<BuilderHelper>();
+		villagerManager = GetComponent<VillagerManager>();
 		gameCamera = Camera.main.GetComponent<MouseOrbit>();
 		ffManager = Camera.main.GetComponent<FrontFaceManager>();
 
@@ -38,6 +40,7 @@ public class GameManager : MonoBehaviour {
 		saveLoad.StartUp();
 		saveLoad.Load(false);
 
+		villagerManager.StartUp();
 		unlockManager.StartUp();
 		uiManager.StartUp();
 		uiManager.UpdateUI();

@@ -12,7 +12,7 @@ public class StructureManager : MonoBehaviour {
 		public List<Effect> effects;
 		public List<Cost> costs;
 
-		[Header("MiscSettings")]
+		[Header("Misc Settings")]
 		public float constructTime = 1f;
 		public float costMultiplier = 1f;
 		public float multiplier = 1f;
@@ -20,17 +20,26 @@ public class StructureManager : MonoBehaviour {
 		public string description;
 		public string footNote;
 
-		[Header("ActiveSettings")]
+		[Header("Active Settings")]
 		public bool passiveStructure = true;
-		public float activeAmount;
 		public float activeMult = 1f;
 		public float activeCostMult = 1f;
 		public List<Effect> activeEffects;
 		public List<Cost> activeCosts;
 
+		[Header("Worker Settings")]
+		public int workerCapacity = 1;
+		public float skillLearnRate = 1.1f;
+		public int workerCount;
+		public float demandAmount;
+		public float activeAmount;
+		public float fullyActiveAmount;
+		public float averageCapacity;
+		public float averageSkill;
 	}
 	
 	public void DoTick(Structure struc){
+
 		foreach(Cost cst in struc.activeCosts){
 			ResourceManager.Resource tmpRes = GM.resourceManager.GetResource (cst.resource);
 			if(tmpRes.amount < (cst.amount * struc.amount / GM.ticks) * struc.activeCostMult)
@@ -53,6 +62,15 @@ public class StructureManager : MonoBehaviour {
 						break;
 				}
 			}
+		}
+	}
+
+	[HideInInspector] public List<Structure> hiringStructures;
+	public void RefreshHiringStructures(){
+		hiringStructures.Clear();
+		foreach(Structure struc in structures){
+			if(struc.fullyActiveAmount < struc.demandAmount)
+				hiringStructures.Add(struc);
 		}
 	}
 
@@ -104,7 +122,7 @@ public class StructureManager : MonoBehaviour {
 
 	public void BuildStructure(string structToBuy){
 		Structure struc = GetStructure (structToBuy);
-		struc.activeAmount++;
+		struc.demandAmount++;
 		foreach(Effect effct in struc.effects) {
 			int enumIndex = (int)effct.effectType;
 			float tmpEffectValue = effct.effectValue;
