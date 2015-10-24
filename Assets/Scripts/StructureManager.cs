@@ -90,6 +90,8 @@ public class StructureManager : MonoBehaviour {
 				if(first){ first = false; count = tmpC; }
 				else if(tmpC < count) count = tmpC;
 			}
+			if(count > maxCount)
+				count = maxCount;
 		} return count;
 	}
 
