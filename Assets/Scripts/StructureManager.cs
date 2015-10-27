@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class StructureManager : MonoBehaviour {
 
@@ -30,22 +31,41 @@ public class StructureManager : MonoBehaviour {
 		[Header("Worker Settings")]
 		public int workerCapacity = 1;
 		public float skillLearnRate = 1.1f;
-		public int workerCount;
 		public float demandAmount;
 		public float activeAmount;
 		public float fullyActiveAmount;
 		public float averageCapacity;
 		public float averageSkill;
+		public List<Villager> workers;
+		public List<PhysicalStructure> pStructs;
 	}
 	
 	public void DoTick(Structure struc){
 
+		//fire the worst people to keep up with demand
+		if(struc.activeAmount > struc.demandAmount){
+			float worst = 100f;
+			Villager worstVill = new Villager();
+			foreach(Villager vill in struc.workers){
+				float tSkill = vill.GetSkill(struc.name).skillLevel;
+				if(tSkill < worst){
+					worst = tSkill;
+					worstVill = vill;
+				}
+			}
+			GM.villagerManager.FireVillager(worstVill);
+			RefreshHiringStructures();
+			CalculateAverages(struc);
+		}else if(struc.activeAmount < struc.demandAmount){
+			RefreshHiringStructures();
+		}
+
 		foreach(Cost cst in struc.activeCosts){
 			ResourceManager.Resource tmpRes = GM.resourceManager.GetResource (cst.resource);
-			if(tmpRes.amount < (cst.amount * struc.amount / GM.ticks) * struc.activeCostMult)
+			if(tmpRes.amount < (cst.amount * struc.activeAmount / GM.ticks) * struc.activeCostMult)
 				return;
-			tmpRes.amount -= (cst.amount * struc.amount / GM.ticks) * struc.activeCostMult;
-			tmpRes.contributors.activeProduction -= (cst.amount * struc.amount) * struc.activeCostMult;
+			tmpRes.amount -= (cst.amount * struc.activeAmount / GM.ticks) * struc.activeCostMult;
+			tmpRes.contributors.activeProduction -= (cst.amount * struc.activeAmount) * struc.activeCostMult;
 		}
 		
 		foreach(Effect effct in struc.activeEffects) {
@@ -55,7 +75,7 @@ public class StructureManager : MonoBehaviour {
 				switch (enumIndex) {
 					case 1: //Produce
 						//tmpRes.amount += (effct.effectValue * struc.activeAmount / GM.ticks) * struc.activeMult;
-						tmpRes.contributors.activeProduction += (effct.effectValue * struc.activeAmount) * struc.activeMult;
+						tmpRes.contributors.activeProduction += effct.effectValue * struc.amount * struc.activeMult * struc.averageCapacity * struc.averageSkill;
 						break;
 					case 3: //SumStorage
 						tmpRes.sumStorage += (effct.effectValue * struc.activeAmount) * struc.activeMult;
@@ -67,11 +87,43 @@ public class StructureManager : MonoBehaviour {
 
 	[HideInInspector] public List<Structure> hiringStructures;
 	public void RefreshHiringStructures(){
-		hiringStructures.Clear();
+		hiringStructures = structures.Where(x => x.fullyActiveAmount < x.demandAmount).ToList();
+		GM.builderHelper.hiringPStructList = GM.builderHelper.pStructList.Where(x => x.structure.workerCapacity != x.employeeList.Count).ToList();
+		Debug.Log(hiringStructures.Count);
+		Debug.Log(GM.builderHelper.hiringPStructList.Count);
+		/*hiringStructures.Clear();
+		GM.builderHelper.pStructList.Where();
 		foreach(Structure struc in structures){
 			if(struc.fullyActiveAmount < struc.demandAmount)
 				hiringStructures.Add(struc);
 		}
+		*/
+	}
+
+	public void CalculateAverages(Structure struc){
+		/*float totalCap = 0f; 
+		float tmpActive = 0f; float tmpFullyActive = 0f; 
+		foreach(PhysicalStructure pS in struc.pStructs){
+			if(pS.employeeList.Count > 0){
+				tmpActive++;
+				if(pS.employeeList.Count == pS.structure.workerCapacity)
+					tmpFullyActive++;
+			}
+			//totalCap += (float)pS.employeeList.Count / (float)pS.structure.workerCapacity;
+		}
+		struc.activeAmount = tmpActive;
+		struc.fullyActiveAmount = tmpFullyActive;
+		*/
+		float totalSkill = 0f;
+		if(struc.workers.Count != 0){
+			foreach(Villager vill in struc.workers){
+				totalSkill += vill.GetSkill(struc.name).skillLevel;
+			}
+			struc.averageSkill = totalSkill / struc.workers.Count;
+		}else{
+			struc.averageSkill = totalSkill;
+		}
+		struc.averageCapacity = struc.workers.Count / (struc.workerCapacity * struc.amount);
 	}
 
 	public Structure GetStructure (string structToGet){

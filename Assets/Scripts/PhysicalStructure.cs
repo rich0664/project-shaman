@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PhysicalStructure : MonoBehaviour {
 
@@ -8,6 +9,7 @@ public class PhysicalStructure : MonoBehaviour {
 	[HideInInspector] public GameManager GM;
 	[HideInInspector] public GameObject constructTimer;
 	[HideInInspector] public float constructTime;
+	public List<Villager> employeeList;
 
 	public void StartConstruct(){
 		StartCoroutine(Construct());
@@ -27,6 +29,7 @@ public class PhysicalStructure : MonoBehaviour {
 			}
 			GM.structureManager.BuildStructure(structure.name);
 		}
+		structure.pStructs.Add(this);
 		Destroy(constructTimer);
 		transform.Find("BSprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
 	}

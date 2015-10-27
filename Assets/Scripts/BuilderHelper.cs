@@ -11,12 +11,13 @@ public class BuilderHelper : MonoBehaviour {
 	[HideInInspector] public Spot lastSpot;
 	[HideInInspector] public List<Spot> spotList;
 	[HideInInspector] public List<Spot> emptySpots;
-	[HideInInspector] public List<PhysicalStructure> pStructList;
+	[HideInInspector] public HashSet<PhysicalStructure> pStructList;
 	[HideInInspector] public List<PhysicalStructure> hiringPStructList;
 
 	// Use this for initialization
 	public void StartUp () {
 		GM = GetComponent<GameManager>();
+		pStructList = new HashSet<PhysicalStructure>();
 	}
 	
 	// Update is called once per frame
@@ -51,7 +52,6 @@ public class BuilderHelper : MonoBehaviour {
 		pStruct.GM = GM;
 		pStruct.constructTimer = timerInst;
 		pStructList.Add(pStruct);
-		hiringPStructList.Add(pStruct);
 		GM.ffManager.updateList.Add(pStruct.transform.GetChild(0));
 		if(instant){
 			pStruct.constructTime = 0f;

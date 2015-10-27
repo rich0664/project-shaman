@@ -17,12 +17,14 @@ public class Villager{
 	// Use this for initialization
 	public void Start () {
 		skillList.Clear();
+		skillDictionary = new Dictionary<string, VillagerSkill> ();
 		StructureManager TSM = GameObject.Find("Management").GetComponent<StructureManager>();
 		foreach(StructureManager.Structure struc in TSM.structures){
 			VillagerSkill tmpSkill = new VillagerSkill();
 			tmpSkill.structName = struc.name;
 			tmpSkill.skillLevel = 1f;
 			skillDictionary [struc.name] = tmpSkill;
+			skillList.Add(tmpSkill);
 		}
 	}
 

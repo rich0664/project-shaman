@@ -65,7 +65,7 @@ public class GameManager : MonoBehaviour {
 					resourceManager.foodMaster.amount += res.amount;
 			}
 			foreach(StructureManager.Structure struc in structureManager.structures)
-				if(!struc.passiveStructure && struc.activeAmount > 0f)
+				if(!struc.passiveStructure && struc.discovered)
 					structureManager.DoTick (struc);
 			foreach(ResourceManager.Resource res in resourceManager.resources)
 				resourceManager.DoTick(res);

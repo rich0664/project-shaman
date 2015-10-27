@@ -55,11 +55,16 @@ public class SaveLoad : MonoBehaviour
 
 		//Physicsal Structures
 		dataString += SaveString("PStructCount", GM.builderHelper.pStructList.Count.ToString());
-		for(int i = 0; i < GM.builderHelper.pStructList.Count; i++){
-			PhysicalStructure pS = GM.builderHelper.pStructList[i];
-			dataString += SaveString("PStructType" + i.ToString(), pS.structure.name);
-			dataString += SaveString("PStructIndex" + i.ToString(), pS.transform.parent.name);
+		int tC = 0;
+		foreach(PhysicalStructure pS in GM.builderHelper.pStructList){
+			dataString += SaveString("PStructType" + tC.ToString(), pS.structure.name);
+			dataString += SaveString("PStructIndex" + tC.ToString(), pS.transform.parent.name);  tC++;
 		}
+		//for(int i = 0; i < GM.builderHelper.pStructList.Count; i++){
+		//	PhysicalStructure pS = GM.builderHelper.pStructList[i];
+		//	dataString += SaveString("PStructType" + i.ToString(), pS.structure.name);
+		//	dataString += SaveString("PStructIndex" + i.ToString(), pS.transform.parent.name);
+		//}
 
 		//Game Settings
 		dataString += SaveString("TiltShift", canvasObj.Find("GameMenu/Tilt").GetComponent<Toggle>().isOn.ToString());
