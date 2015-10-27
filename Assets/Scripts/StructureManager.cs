@@ -89,8 +89,8 @@ public class StructureManager : MonoBehaviour {
 	public void RefreshHiringStructures(){
 		hiringStructures = structures.Where(x => x.fullyActiveAmount < x.demandAmount).ToList();
 		GM.builderHelper.hiringPStructList = GM.builderHelper.pStructList.Where(x => x.structure.workerCapacity != x.employeeList.Count).ToList();
-		Debug.Log(hiringStructures.Count);
-		Debug.Log(GM.builderHelper.hiringPStructList.Count);
+		//Debug.Log(hiringStructures.Count);
+		//Debug.Log(GM.builderHelper.hiringPStructList.Count);
 		/*hiringStructures.Clear();
 		GM.builderHelper.pStructList.Where();
 		foreach(Structure struc in structures){
@@ -175,6 +175,7 @@ public class StructureManager : MonoBehaviour {
 	public void BuildStructure(string structToBuy){
 		Structure struc = GetStructure (structToBuy);
 		struc.demandAmount++;
+		struc.demandAmount = Mathf.Clamp(struc.demandAmount, 0f, struc.amount);
 		foreach(Effect effct in struc.effects) {
 			int enumIndex = (int)effct.effectType;
 			float tmpEffectValue = effct.effectValue;

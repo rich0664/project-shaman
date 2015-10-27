@@ -21,7 +21,7 @@ public class VillagerManager : MonoBehaviour {
 	int villagerI = 0;
 	IEnumerator FreeWill(){
 		while(true){
-			if(!GM.paused){
+			if(!GM.paused && villagers.Count > 0){
 				if(villagerI >= villagers.Count)
 					villagerI = 0;
 				Villager tmpVillager = villagers[villagerI];
@@ -50,8 +50,8 @@ public class VillagerManager : MonoBehaviour {
 						tmpVillager.experienced = true;
 					}
 				}
+				villagerI++;
 			}
-			villagerI++;
 			yield return new WaitForEndOfFrame();
 		}
 	}
@@ -86,6 +86,7 @@ public class VillagerManager : MonoBehaviour {
 		for(int i = 0; i < amount; i++){
 			Villager tmpVillager = new Villager();
 			villagers.Add(tmpVillager);
+			tmpVillager.name = "Villager " + villagers.Count.ToString();
 			tmpVillager.Start();
 		}
 	}

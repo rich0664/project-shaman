@@ -189,7 +189,7 @@ public class BuilderHelper : MonoBehaviour {
 			if(!lastSpot.filled){
 				GM.uiManager.QuickBuildTooltip();
 			}else{
-				GM.uiManager.StructInfo(lastSpot.GetComponentInChildren<PhysicalStructure>().structure.name);
+				GM.uiManager.StructInfo(lastSpot.GetComponentInChildren<PhysicalStructure>());
 			}
 		}
 	}

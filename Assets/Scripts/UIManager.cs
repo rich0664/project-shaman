@@ -38,6 +38,10 @@ public class UIManager : MonoBehaviour
 			button.onClick.AddListener (delegate {
 				StructureTooltip (strucGO.name);
 			});
+			Slider demandSlider = strucGO.transform.Find ("Struct/Slider").GetComponent<Slider> ();
+			demandSlider.onValueChanged.AddListener((value) => {
+				struc.demandAmount = value;
+			});
 		}
 		ShamanMenu = canvasObj.transform.Find ("ShamanMenu").gameObject;
 	}
@@ -92,6 +96,20 @@ public class UIManager : MonoBehaviour
 		} else if (str == "Leadership") {
 			MES.SetSelectedGameObject (
 				canvasObj.transform.Find (str + "/Tabs/Resources/Button").gameObject);
+
+			Transform roster = canvasObj.transform.Find (str + "/RosterScroll/Roster");
+			for(int i = 1; i < roster.childCount; i++)
+				Destroy(roster.GetChild(i).gameObject);			
+			GameObject rosterElement = roster.transform.Find ("RosterElement").gameObject;
+			foreach(Villager vill in GM.villagerManager.villagers){
+				GameObject rosterInst = GameObject.Instantiate(rosterElement);
+				rosterInst.transform.SetParent(roster);
+				rosterInst.transform.localScale = Vector3.one;
+				Image rosterImage = rosterInst.transform.Find("Image").GetComponent<Image>();
+				Text rosterText = rosterInst.transform.Find("Text").GetComponent<Text>();
+				rosterImage.sprite = Resources.Load<Sprite> ("VillagerIcons/Heads/VH" + vill.headIconIndex.ToString());
+				rosterText.text = vill.name;
+			}
 		}
 		KillTooltip(true);
 		ShamanMenu.SetActive (!isMenu);
@@ -134,6 +152,15 @@ public class UIManager : MonoBehaviour
 
 			Text nameText = tmpStrucUI.transform.Find ("Struct/Text").GetComponent<Text> ();
 			nameText.text = struc.displayName + " (" + struc.activeAmount + "/" + struc.amount + ")";
+
+			Slider demandSlider = tmpStrucUI.transform.Find ("Struct/Slider").GetComponent<Slider> ();
+			demandSlider.maxValue = struc.amount;
+			demandSlider.value = struc.demandAmount;
+			Text valueText = tmpStrucUI.transform.Find ("Struct/Slider/ValueText").GetComponent<Text> ();
+			valueText.text = demandSlider.value.ToString();
+			Slider employedSlider = tmpStrucUI.transform.Find ("Struct/Slider/DemoSlider").GetComponent<Slider> ();
+			employedSlider.maxValue = struc.amount;
+			employedSlider.value = struc.fullyActiveAmount;
 		}
 	}
 
@@ -143,7 +170,7 @@ public class UIManager : MonoBehaviour
 	public int toolSwitch = 0;
 	List<string> couldBuyList;
 
-	public void StructInfo(string structType){
+	public void StructInfo(PhysicalStructure pStruc){
 		if(GM.builderHelper.isPlacing)
 			return;
 		if(toolTip)
@@ -158,8 +185,23 @@ public class UIManager : MonoBehaviour
 		toolTip.SetActive (true);
 		toolTip.transform.localScale = Vector3.one;
 		toolTip.transform.localPosition = Vector3.zero;
-		Sprite strucIcon = Resources.Load<Sprite> ("BuildingIcons/" + structType);
+		Sprite strucIcon = Resources.Load<Sprite> ("BuildingIcons/" + pStruc.structure.name);
 		toolTip.transform.Find ("StructIcon").GetComponent<Image> ().sprite = strucIcon;
+
+		StructureManager.Structure struc = GM.structureManager.GetStructure(pStruc.structure.name);
+		toolTip.transform.Find ("NameText").GetComponent<Text>().text = struc.displayName;
+		Transform roster = toolTip.transform.Find ("Roster");
+		GameObject rosterElement = toolTip.transform.Find ("Roster/RosterElement").gameObject;
+		foreach(Villager vill in pStruc.employeeList){
+			GameObject rosterInst = GameObject.Instantiate(rosterElement);
+			rosterInst.transform.SetParent(roster);
+			rosterInst.transform.localScale = Vector3.one;
+			Image rosterImage = rosterInst.transform.Find("Image").GetComponent<Image>();
+			Text rosterText = rosterInst.transform.Find("Text").GetComponent<Text>();
+			rosterImage.sprite = Resources.Load<Sprite> ("VillagerIcons/Heads/VH" + vill.headIconIndex.ToString());
+			rosterText.text = vill.name;
+		}
+
 	}
 
 	public void QuickBuildTooltip ()
