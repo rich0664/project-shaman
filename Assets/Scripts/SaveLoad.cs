@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using PlayerPrefs = PreviewLabs.PlayerPrefs;
 
 public class SaveLoad : MonoBehaviour
 {
@@ -14,13 +16,17 @@ public class SaveLoad : MonoBehaviour
 	public void StartUp (){
 		GM = GetComponent<GameManager> ();
 		canvasObj = GameObject.Find ("UICanvas").transform;
-		savePref = "DefaultData";
-		Save(false);
+		//savePref = "DefaultData";
+		//Save(false);
 		savePref = "SaveData";
 	}
 	
 	public void Save (bool quit){
 		string dataString = "";
+
+		//Villagers
+		if(GM.villagerManager.villagers.Count > 0)
+			Serializer.SaveObj("VillagerData", GM.villagerManager.villagers.ToList());
 
 		foreach(ResourceManager.Resource res in GM.resourceManager.resources){
 			dataString += SaveString(res.name + "Amount", res.amount.ToString());
@@ -40,31 +46,44 @@ public class SaveLoad : MonoBehaviour
 			dataString += SaveString(struc.name + "ConstructTime", struc.constructTime.ToString());
 			dataString += SaveString(struc.name + "CostMultiplier", struc.costMultiplier.ToString());
 			dataString += SaveString(struc.name + "Multiplier", struc.multiplier.ToString());
-			dataString += SaveString(struc.name + "ActiveAmount", struc.activeAmount.ToString());
 			dataString += SaveString(struc.name + "ActiveMult", struc.activeMult.ToString());
 			dataString += SaveString(struc.name + "ActiveCostMult", struc.activeCostMult.ToString());
 			dataString += SaveString(struc.name + "Discovered", struc.discovered.ToString());
+			dataString += SaveString(struc.name + "ActiveAmount", struc.activeAmount.ToString());
+			dataString += SaveString(struc.name + "FullyActiveAmount", struc.fullyActiveAmount.ToString());
+			dataString += SaveString(struc.name + "DemandAmount", struc.demandAmount.ToString());
 			foreach(Cost cst in struc.costs){
 				dataString += SaveString(struc.name + cst.resource + "ActiveCostAmount", cst.amount.ToString());
 				dataString += SaveString(struc.name + cst.resource + "ActiveCostScaling", cst.scaling.ToString());
 			}
 		}
 
+		//structureworkers 
+		Serializer.SaveObj("WorkerData", GM.structureManager.structures.ToList());
+
 		//Grid
 		dataString += SaveString("GridRings", GM.gridManager.rings.ToString());
 
-		//Physicsal Structures
+		/* Physicsal Structures
 		dataString += SaveString("PStructCount", GM.builderHelper.pStructList.Count.ToString());
 		int tC = 0;
 		foreach(PhysicalStructure pS in GM.builderHelper.pStructList){
 			dataString += SaveString("PStructType" + tC.ToString(), pS.structure.name);
 			dataString += SaveString("PStructIndex" + tC.ToString(), pS.transform.parent.name);  tC++;
 		}
-		//for(int i = 0; i < GM.builderHelper.pStructList.Count; i++){
-		//	PhysicalStructure pS = GM.builderHelper.pStructList[i];
-		//	dataString += SaveString("PStructType" + i.ToString(), pS.structure.name);
-		//	dataString += SaveString("PStructIndex" + i.ToString(), pS.transform.parent.name);
-		//}
+		*/
+		//if(GM.builderHelper.pStructData.ToList().Count > 0)
+			//Debug.Log(GM.builderHelper.pStructData.ToList()[0].eList.Count);
+		GM.builderHelper.pStructData.Clear();
+		foreach(PhysicalStructure ps in GM.builderHelper.pStructList){
+			pStructInfo psi = new pStructInfo();
+			psi.eList = ps.employeeList;
+			psi.pIndex = ps.spotIndex;
+			psi.type = ps.structure.name;
+			GM.builderHelper.pStructData.Add(psi);
+		}
+		if(GM.builderHelper.pStructList.Count > 0)
+			Serializer.SaveObj("pStructData", GM.builderHelper.pStructData.ToList());
 
 		//Game Settings
 		dataString += SaveString("TiltShift", canvasObj.Find("GameMenu/Tilt").GetComponent<Toggle>().isOn.ToString());
@@ -74,7 +93,7 @@ public class SaveLoad : MonoBehaviour
 		dataString += SaveString("FoliageDensity", canvasObj.Find("GameMenu/FoliageSlider").GetComponent<Slider>().value.ToString());
 
 		PlayerPrefs.SetString(savePref, dataString);
-		PlayerPrefs.Save();
+		PlayerPrefs.Flush();
 
 		if (quit)
 			Application.Quit ();
@@ -84,7 +103,21 @@ public class SaveLoad : MonoBehaviour
 		if(!PlayerPrefs.HasKey("SaveData"))
 			Save(false);
 
+		//Villagers
+		if(PlayerPrefs.HasKey("VillagerData"))
+			GM.villagerManager.villagers = (List<Villager>)Serializer.LoadObj("VillagerData");
+
+
+		List<StructureManager.Structure> sList = (List<StructureManager.Structure>)Serializer.LoadObj("WorkerData");
+		Debug.Log(sList[0].workers.Count);
 		foreach(StructureManager.Structure struc in GM.structureManager.structures){
+			//StructureWorkers
+			if(PlayerPrefs.HasKey("WorkerData")){
+				StructureManager.Structure serialStruc = sList.Find(x => x.name == struc.name);
+				foreach(Villager serialVill in serialStruc.workers){
+					struc.workers.Add(GM.villagerManager.villagers.Find(x => x.uniqueID == serialVill.uniqueID));
+				}
+			}
 			float.TryParse(LoadString(struc.name + "Amount"), out struc.amount);
 			foreach(Cost cst in struc.costs){
 				float.TryParse(LoadString(struc.name + cst.resource + "CostAmount"), out cst.amount);
@@ -93,14 +126,17 @@ public class SaveLoad : MonoBehaviour
 			float.TryParse(LoadString(struc.name + "ConstructTime"), out struc.constructTime);
 			float.TryParse(LoadString(struc.name + "CostMultiplier"), out struc.costMultiplier);
 			float.TryParse(LoadString(struc.name + "Multiplier"), out struc.multiplier);
-			float.TryParse(LoadString(struc.name + "ActiveAmount"), out struc.activeAmount);
 			float.TryParse(LoadString(struc.name + "ActiveMult"), out struc.activeMult);
 			float.TryParse(LoadString(struc.name + "ActiveCostMult"), out struc.activeCostMult);
 			bool.TryParse(LoadString(struc.name + "Discovered"), out struc.discovered);;
+			float.TryParse(LoadString(struc.name + "ActiveAmount"), out struc.activeAmount);
+			float.TryParse(LoadString(struc.name + "FullyActiveAmount"), out struc.fullyActiveAmount);
+			float.TryParse(LoadString(struc.name + "DemandAmount"), out struc.demandAmount);
 			foreach(Cost cst in struc.costs){
 				float.TryParse(LoadString(struc.name + cst.resource + "ActiveCostAmount"), out cst.amount);
 				float.TryParse(LoadString(struc.name + cst.resource + "ActiveCostScaling"), out cst.scaling);
 			}
+			GM.structureManager.CalculateAverages(struc);
 		}
 		foreach(ResourceManager.Resource res in GM.resourceManager.resources){
 			float.TryParse(LoadString(res.name + "Amount"), out res.amount);
@@ -116,16 +152,30 @@ public class SaveLoad : MonoBehaviour
 		//Grid
 		GM.gridManager.rings = 0;
 		int tmpRings = 0; int.TryParse(LoadString("GridRings"), out tmpRings);
-		for(int i = 0; i < tmpRings; i++){
+		if(tmpRings > 0){
+			for(int i = 0; i < tmpRings - 1; i++)
+				GM.gridManager.TryExpand(false);			
 			GM.gridManager.TryExpand(true);
 		}
 
-		//Physicsal Structures
+		/*Physicsal Structures
 		int psCount = 0; int.TryParse(LoadString("PStructCount"), out psCount);
 		for(int i = 0; i < psCount; i++){
 			int spotIndex = 0; int.TryParse(LoadString("PStructIndex" + i.ToString()), out spotIndex);
 			GM.builderHelper.lastSpot = GM.builderHelper.spotList[spotIndex - 1];
 			GM.builderHelper.QuickBuild(LoadString("PStructType" + i.ToString()), true);
+		}
+		*/
+		if(PlayerPrefs.HasKey("pStructData")){
+			List<pStructInfo> pSI = (List<pStructInfo>)Serializer.LoadObj("pStructData");
+			foreach(pStructInfo ps in pSI){
+				int spotIndex = 0; int.TryParse(ps.pIndex, out spotIndex);
+				GM.builderHelper.lastSpot = GM.builderHelper.spotList[spotIndex - 1];
+				PhysicalStructure tmpPStruct = GM.builderHelper.QuickBuild(ps.type, true);
+				foreach(Villager vill in ps.eList){
+					tmpPStruct.employeeList.Add(GM.villagerManager.villagers.Find(x => x.uniqueID == vill.uniqueID));
+				}
+			}
 		}
 
 		//Game Settings
@@ -146,7 +196,9 @@ public class SaveLoad : MonoBehaviour
 
 	public void RESET(){
 		PlayerPrefs.DeleteKey("SaveData");
-		PlayerPrefs.Save();
+		PlayerPrefs.DeleteKey("pStructData");
+		PlayerPrefs.DeleteKey("VillagerData");
+		PlayerPrefs.Flush();
 		Application.LoadLevel("Main");
 	}
 
@@ -157,8 +209,12 @@ public class SaveLoad : MonoBehaviour
 	string LoadString(string varToGet){
 		string tmpData = PlayerPrefs.GetString(savePref);
 		string sString = "<" + varToGet + ">";
+
 		string eString = "</" + varToGet + ">";
-		int sI = tmpData.IndexOf(sString) + sString.Length;
+		int sI = tmpData.IndexOf(sString);
+		if(sI == -1)
+			return null;
+		sI += sString.Length;
 		int eI = tmpData.IndexOf(eString); 
 		return tmpData.Substring(sI, eI - sI);
 	}

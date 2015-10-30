@@ -37,25 +37,28 @@ public class StructureManager : MonoBehaviour {
 		public float averageCapacity;
 		public float averageSkill;
 		public List<Villager> workers;
-		public List<PhysicalStructure> pStructs;
+		//[System.NonSerialized] 
+		//public List<PhysicalStructure> pStructs;
 	}
 	
 	public void DoTick(Structure struc){
 
 		//fire the worst people to keep up with demand
 		if(struc.activeAmount > struc.demandAmount){
-			float worst = 100f;
-			Villager worstVill = new Villager();
-			foreach(Villager vill in struc.workers){
-				float tSkill = vill.GetSkill(struc.name).skillLevel;
-				if(tSkill < worst){
-					worst = tSkill;
-					worstVill = vill;
+			if(struc.workers.Count > 0){
+				float worst = 100f;
+				Villager worstVill = new Villager();
+				foreach(Villager vill in struc.workers){
+					float tSkill = vill.GetSkill(struc.name).skillLevel;
+					if(tSkill < worst){
+						worst = tSkill;
+						worstVill = vill;
+					}
 				}
+				GM.villagerManager.FireVillager(worstVill);
+				RefreshHiringStructures();
+				CalculateAverages(struc);
 			}
-			GM.villagerManager.FireVillager(worstVill);
-			RefreshHiringStructures();
-			CalculateAverages(struc);
 		}else if(struc.activeAmount < struc.demandAmount){
 			RefreshHiringStructures();
 		}
@@ -101,19 +104,6 @@ public class StructureManager : MonoBehaviour {
 	}
 
 	public void CalculateAverages(Structure struc){
-		/*float totalCap = 0f; 
-		float tmpActive = 0f; float tmpFullyActive = 0f; 
-		foreach(PhysicalStructure pS in struc.pStructs){
-			if(pS.employeeList.Count > 0){
-				tmpActive++;
-				if(pS.employeeList.Count == pS.structure.workerCapacity)
-					tmpFullyActive++;
-			}
-			//totalCap += (float)pS.employeeList.Count / (float)pS.structure.workerCapacity;
-		}
-		struc.activeAmount = tmpActive;
-		struc.fullyActiveAmount = tmpFullyActive;
-		*/
 		float totalSkill = 0f;
 		if(struc.workers.Count != 0){
 			foreach(Villager vill in struc.workers){

@@ -8,12 +8,14 @@ public class Villager{
 	public string name;
 	public float age;
 	public float health;
-	public PhysicalStructure worksAt;
-	public PhysicalStructure livesAt;
+	public string worksAt;
+	public string livesAt;
 	public List<VillagerSkill> skillList;
 	public bool experienced = false;
 	[HideInInspector] public int headIconIndex;
+	[HideInInspector] public int uniqueID;
 
+	//[System.NonSerialized]
 	Dictionary<string, VillagerSkill> skillDictionary;
 
 

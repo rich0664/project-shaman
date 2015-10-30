@@ -13,11 +13,13 @@ public class BuilderHelper : MonoBehaviour {
 	[HideInInspector] public List<Spot> emptySpots;
 	[HideInInspector] public HashSet<PhysicalStructure> pStructList;
 	[HideInInspector] public List<PhysicalStructure> hiringPStructList;
+	[HideInInspector] public HashSet<pStructInfo> pStructData;
 
 	// Use this for initialization
 	public void StartUp () {
 		GM = GetComponent<GameManager>();
 		pStructList = new HashSet<PhysicalStructure>();
+		pStructData = new HashSet<pStructInfo>();
 	}
 	
 	// Update is called once per frame
@@ -26,18 +28,18 @@ public class BuilderHelper : MonoBehaviour {
 		CheckTouchHold();
 	}
 
-	public void QuickBuild(string typeToBuild, bool instant){
+	public PhysicalStructure QuickBuild(string typeToBuild, bool instant){
 		if(!instant)
 			GM.structureManager.BuyStructure(typeToBuild);
-		BuildOnSpot(typeToBuild, instant);
 		lastSpot.filled = true;
 		if(GM.uiManager.toolTip)
 		if(GM.uiManager.toolTip.name == "QuickBuildTooltip"){
 			GM.uiManager.KillTooltip(true);
 		}
+		return BuildOnSpot(typeToBuild, instant);
 	}
 
-	public void BuildOnSpot(string typeToBuild, bool instant){
+	public PhysicalStructure BuildOnSpot(string typeToBuild, bool instant){
 		GameObject buildInst = GameObject.Instantiate(Resources.Load<GameObject>("BuildingPrefabs/Construction"));
 		GameObject timerInst = GameObject.Instantiate(GameObject.Find("WorldCanvasOcc").transform.Find("Templates/ConstructionTimer").gameObject);
 		timerInst.transform.SetParent(GameObject.Find("WorldCanvasOcc").transform);
@@ -58,7 +60,9 @@ public class BuilderHelper : MonoBehaviour {
 		}else{
 			pStruct.constructTime = pStruct.structure.constructTime;
 		}
+		pStruct.spotIndex = pStruct.transform.parent.name;
 		pStruct.StartConstruct();
+		return pStruct;
 	}
 
 	bool isHeld = false;
@@ -121,7 +125,7 @@ public class BuilderHelper : MonoBehaviour {
 			tmpSpot.filled = true;
 		}
 		for(int i = 0; i < buildCount; i++){
-			yield return new WaitForSeconds(0.1f);
+			yield return new WaitForSeconds(0.005f);
 			lastSpot = batchSpots[i];
 			BuildOnSpot(toBuild, false);
 		}

@@ -28,9 +28,7 @@ public class GridManager : MonoBehaviour {
 	}
 
 	public void TryExpand(bool str){
-		if(str){
-			Expand();
-		}
+		Expand(str);
 	}
 
 	public void AdjustFoliageDensity(float amount){
@@ -73,11 +71,12 @@ public class GridManager : MonoBehaviour {
 			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
 			foliages.Add(treeInst.transform);
 		}
-
+		//rot = Quaternion.Euler(Vector3.zero);
+		GM.ffManager.rot = Quaternion.Euler(Vector3.zero);
 		foliageCount += 8;
 	}
 
-	void Expand(){
+	void Expand(bool reFoliage){
 		if(rings >= expandAt){
 			expandAt += expandInc;
 			expandInc *= 2;
@@ -96,7 +95,11 @@ public class GridManager : MonoBehaviour {
 			spotInst.name = spotCount.ToString();
 			GM.builderHelper.spotList.Add(spotInst.GetComponent<Spot>());
 		}
-		ProcessFoliage();
+		if(reFoliage){
+			ProcessFoliage();
+		}else{
+			foliageCount += 8;
+		}
 		Ring.transform.RotateAround(Vector3.zero, Vector3.up, rotat);
 		if(rotat == rotationIncrement){
 			rotat = 0f;
@@ -104,13 +107,6 @@ public class GridManager : MonoBehaviour {
 		rings++;
 		GM.gameCamera.ExpandDistance(52f);
 		GameObject.Find("DiscoveredGround").transform.localScale += Vector3.one * 2f;
-	}
-
-	IEnumerator TestLoop(){
-		while(true){
-			yield return new WaitForSeconds(0.4f);
-			Expand();
-		}
 	}
 
 }

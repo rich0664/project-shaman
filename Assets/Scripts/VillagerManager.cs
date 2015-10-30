@@ -7,13 +7,17 @@ public class VillagerManager : MonoBehaviour {
 
 	public List<Villager> villagers;
 	GameManager GM;
+	int iDentifier = 0;
 
 	public void StartUp () {
 		GM = GetComponent<GameManager>();
 		StartCoroutine(FreeWill());
-		for(int i = 0; i < villagers.Count; i++){
-			Villager tmpVillager = villagers[i];
-			tmpVillager.Start();
+		foreach(Villager vill in villagers){
+			if(vill.skillList.Count == 0){
+				vill.Start();
+				vill.uniqueID = iDentifier;
+				iDentifier++;
+			}
 		}
 		GM.structureManager.RefreshHiringStructures();
 	}
@@ -39,10 +43,9 @@ public class VillagerManager : MonoBehaviour {
 							}
 						}
 					}
-
 					StructureManager.Structure optimalStruct = GM.structureManager.GetStructure(GM.structureManager.hiringStructures[bestSkill].name);
-					if(!tmpVillager.worksAt || tmpVillager.worksAt.structure.name != optimalStruct.name){
-						if(tmpVillager.worksAt)
+					if(tmpVillager.worksAt == null || PStructFromIndex(tmpVillager.worksAt).structure.name != optimalStruct.name){
+						if(tmpVillager.worksAt != null)
 							FireVillager(tmpVillager);
 						HireVillager(tmpVillager, optimalStruct);
 						GM.structureManager.RefreshHiringStructures();
@@ -56,12 +59,15 @@ public class VillagerManager : MonoBehaviour {
 		}
 	}
 
+	PhysicalStructure PStructFromIndex(string index){
+		return GM.builderHelper.pStructList.Where(x => x.transform.parent.name == index).First();
+	}
 
 	public void HireVillager(Villager villager, StructureManager.Structure struc){
 		IEnumerable<PhysicalStructure> hiringList = GM.builderHelper.hiringPStructList.Where(x => x.structure == struc);
 		if(hiringList.Count() > 0){
 			PhysicalStructure hiringStruc = hiringList.First();
-			villager.worksAt = hiringStruc;
+			villager.worksAt = hiringStruc.spotIndex;
 			struc.workers.Add(villager);
 			if(hiringStruc.employeeList.Count == 0)
 				struc.activeAmount++;
@@ -71,12 +77,13 @@ public class VillagerManager : MonoBehaviour {
 		}
 	}
 	public void FireVillager(Villager villager){
-		StructureManager.Structure struc = villager.worksAt.structure;
+		PhysicalStructure tmpPStruct = PStructFromIndex(villager.worksAt);
+		StructureManager.Structure struc = tmpPStruct.structure;
 		struc.workers.Remove(villager);
-		if(villager.worksAt.employeeList.Count == struc.workerCapacity)
+		if(tmpPStruct.employeeList.Count == struc.workerCapacity)
 			struc.fullyActiveAmount--;
-		villager.worksAt.employeeList.Remove(villager);
-		if(villager.worksAt.employeeList.Count == 0)
+		tmpPStruct.employeeList.Remove(villager);
+		if(tmpPStruct.employeeList.Count == 0)
 			struc.activeAmount--;
 		villager.worksAt = null;
 	}
@@ -88,6 +95,8 @@ public class VillagerManager : MonoBehaviour {
 			villagers.Add(tmpVillager);
 			tmpVillager.name = "Villager " + villagers.Count.ToString();
 			tmpVillager.Start();
+			tmpVillager.uniqueID = iDentifier;
+			iDentifier++;
 		}
 	}
 

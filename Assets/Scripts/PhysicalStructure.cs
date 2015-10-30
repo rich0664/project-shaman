@@ -9,10 +9,12 @@ public class PhysicalStructure : MonoBehaviour {
 	[HideInInspector] public GameManager GM;
 	[HideInInspector] public GameObject constructTimer;
 	[HideInInspector] public float constructTime;
+	[HideInInspector] public string spotIndex;
 	public List<Villager> employeeList;
 
 	public void StartConstruct(){
 		StartCoroutine(Construct());
+		spotIndex = transform.parent.name;
 	}
 
 	Image timer;
@@ -29,7 +31,7 @@ public class PhysicalStructure : MonoBehaviour {
 			}
 			GM.structureManager.BuildStructure(structure.name);
 		}
-		structure.pStructs.Add(this);
+		//structure.pStructs.Add(this);
 		Destroy(constructTimer);
 		transform.Find("BSprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
 	}

@@ -449,9 +449,9 @@ public class UIManager : MonoBehaviour
 		}
 
 		Transform lch = toolTip.transform.Find ("CostHead/CostInfo");
-		Transform leh = toolTip.transform.Find ("EffectHead/EffectInfo");
-		int costCount = tmpStruc.costs.Count;
-		int effectCount = tmpStruc.effects.Count + tmpStruc.activeEffects.Count + tmpStruc.activeCosts.Count;
+		//Transform leh = toolTip.transform.Find ("EffectHead/EffectInfo");
+		//int costCount = tmpStruc.costs.Count;
+		//int effectCount = tmpStruc.effects.Count + tmpStruc.activeEffects.Count + tmpStruc.activeCosts.Count;
 
 		for (int i = 0; i < tmpStruc.costs.Count; i++) {
 			Cost tmpCst = tmpStruc.costs[i];
