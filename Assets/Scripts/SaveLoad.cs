@@ -114,6 +114,8 @@ public class SaveLoad : MonoBehaviour
 			//StructureWorkers
 			if(PlayerPrefs.HasKey("WorkerData")){
 				StructureManager.Structure serialStruc = sList.Find(x => x.name == struc.name);
+				if(serialStruc == null)
+					continue;
 				foreach(Villager serialVill in serialStruc.workers){
 					struc.workers.Add(GM.villagerManager.villagers.Find(x => x.uniqueID == serialVill.uniqueID));
 				}

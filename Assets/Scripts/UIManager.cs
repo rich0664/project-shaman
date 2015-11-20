@@ -41,6 +41,7 @@ public class UIManager : MonoBehaviour
 			Slider demandSlider = strucGO.transform.Find ("Struct/Slider").GetComponent<Slider> ();
 			demandSlider.onValueChanged.AddListener((value) => {
 				struc.demandAmount = value;
+				GM.structureManager.RefreshHiringStructures();
 			});
 		}
 		ShamanMenu = canvasObj.transform.Find ("ShamanMenu").gameObject;

@@ -29,7 +29,10 @@ public class PhysicalStructure : MonoBehaviour {
 				timer.fillAmount = conTime / constructTime;
 				yield return new WaitForSeconds(delay);
 			}
+			GM.builderHelper.pStructList.Add(this);
 			GM.structureManager.BuildStructure(structure.name);
+		}else{
+			GM.builderHelper.pStructList.Add(this);
 		}
 		//structure.pStructs.Add(this);
 		Destroy(constructTimer);

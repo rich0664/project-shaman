@@ -10,6 +10,7 @@ public class StructureManager : MonoBehaviour {
 		public string name;
 		public string displayName;
 		public float amount;
+		public bool isHouse;
 		public List<Effect> effects;
 		public List<Cost> costs;
 
@@ -55,13 +56,13 @@ public class StructureManager : MonoBehaviour {
 						worstVill = vill;
 					}
 				}
-				GM.villagerManager.FireVillager(worstVill);
-				RefreshHiringStructures();
+				GM.villagerManager.FireVillager(worstVill, struc.isHouse);
+				GM.shouldRefreshStructs = true;
 				CalculateAverages(struc);
 			}
-		}else if(struc.activeAmount < struc.demandAmount){
-			RefreshHiringStructures();
-		}
+		}//else if(struc.activeAmount < struc.demandAmount){
+		//	RefreshHiringStructures();
+		//}
 
 		foreach(Cost cst in struc.activeCosts){
 			ResourceManager.Resource tmpRes = GM.resourceManager.GetResource (cst.resource);
@@ -90,8 +91,8 @@ public class StructureManager : MonoBehaviour {
 
 	[HideInInspector] public List<Structure> hiringStructures;
 	public void RefreshHiringStructures(){
-		hiringStructures = structures.Where(x => x.fullyActiveAmount < x.demandAmount).ToList();
-		GM.builderHelper.hiringPStructList = GM.builderHelper.pStructList.Where(x => x.structure.workerCapacity != x.employeeList.Count).ToList();
+		hiringStructures = structures.Where(x => !x.isHouse && x.fullyActiveAmount < x.demandAmount).ToList();
+		GM.builderHelper.hiringPStructList = GM.builderHelper.pStructList.Where(x => x.structure.workerCapacity != x.employeeList.Count).ToHashSet();
 		//Debug.Log(hiringStructures.Count);
 		//Debug.Log(GM.builderHelper.hiringPStructList.Count);
 		/*hiringStructures.Clear();
@@ -197,6 +198,7 @@ public class StructureManager : MonoBehaviour {
 				}
 			}
 		}
+		RefreshHiringStructures();
 	}
 
 	public List<Structure> structures;

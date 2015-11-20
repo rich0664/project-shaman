@@ -26,9 +26,12 @@ public class VillagerManager : MonoBehaviour {
 	IEnumerator FreeWill(){
 		while(true){
 			if(!GM.paused && villagers.Count > 0){
+
 				if(villagerI >= villagers.Count)
 					villagerI = 0;
 				Villager tmpVillager = villagers[villagerI];
+
+				//job stuff
 				if(GM.structureManager.hiringStructures.Count != 0){
 					int hiringCount = GM.structureManager.hiringStructures.Count;
 					int bestSkill = Random.Range(0, hiringCount);
@@ -53,7 +56,20 @@ public class VillagerManager : MonoBehaviour {
 						tmpVillager.experienced = true;
 					}
 				}
+
+				//housing stuff
+				if(tmpVillager.livesAt == null){
+					StructureManager.Structure housingStruc = GM.structureManager.structures.Find(x => x.isHouse && x.fullyActiveAmount < x.demandAmount);
+					if(housingStruc != null){
+						HireVillager(tmpVillager, housingStruc);
+						GM.structureManager.RefreshHiringStructures();
+						GM.structureManager.CalculateAverages(housingStruc);
+					}
+				}
+
+				//end algorithm and ++ to next villager
 				villagerI++;
+
 			}
 			yield return new WaitForEndOfFrame();
 		}
@@ -67,7 +83,11 @@ public class VillagerManager : MonoBehaviour {
 		IEnumerable<PhysicalStructure> hiringList = GM.builderHelper.hiringPStructList.Where(x => x.structure == struc);
 		if(hiringList.Count() > 0){
 			PhysicalStructure hiringStruc = hiringList.First();
-			villager.worksAt = hiringStruc.spotIndex;
+			if(struc.isHouse){
+				villager.livesAt = hiringStruc.spotIndex;
+			}else{
+				villager.worksAt = hiringStruc.spotIndex;
+			}
 			struc.workers.Add(villager);
 			if(hiringStruc.employeeList.Count == 0)
 				struc.activeAmount++;
@@ -76,7 +96,7 @@ public class VillagerManager : MonoBehaviour {
 				struc.fullyActiveAmount++;
 		}
 	}
-	public void FireVillager(Villager villager){
+	public void FireVillager(Villager villager, bool housing = false){
 		PhysicalStructure tmpPStruct = PStructFromIndex(villager.worksAt);
 		StructureManager.Structure struc = tmpPStruct.structure;
 		struc.workers.Remove(villager);
@@ -85,7 +105,11 @@ public class VillagerManager : MonoBehaviour {
 		tmpPStruct.employeeList.Remove(villager);
 		if(tmpPStruct.employeeList.Count == 0)
 			struc.activeAmount--;
-		villager.worksAt = null;
+		if(housing){
+			villager.livesAt = null;
+		}else{
+			villager.worksAt = null;
+		}
 	}
 
 

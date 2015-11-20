@@ -12,7 +12,7 @@ public class BuilderHelper : MonoBehaviour {
 	[HideInInspector] public List<Spot> spotList;
 	[HideInInspector] public List<Spot> emptySpots;
 	[HideInInspector] public HashSet<PhysicalStructure> pStructList;
-	[HideInInspector] public List<PhysicalStructure> hiringPStructList;
+	[HideInInspector] public HashSet<PhysicalStructure> hiringPStructList;
 	[HideInInspector] public HashSet<pStructInfo> pStructData;
 
 	// Use this for initialization
@@ -53,7 +53,7 @@ public class BuilderHelper : MonoBehaviour {
 		pStruct.structure = GM.structureManager.GetStructure(typeToBuild);
 		pStruct.GM = GM;
 		pStruct.constructTimer = timerInst;
-		pStructList.Add(pStruct);
+		//pStructList.Add(pStruct);
 		GM.ffManager.updateList.Add(pStruct.transform.GetChild(0));
 		if(instant){
 			pStruct.constructTime = 0f;

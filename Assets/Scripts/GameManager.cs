@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	float delay = 0.1f;
+	[HideInInspector] public bool shouldRefreshStructs = false;
 	IEnumerator GameLoop (){
 		while(true) {
 			yield return new WaitForSeconds (delay);
@@ -67,6 +68,8 @@ public class GameManager : MonoBehaviour {
 			foreach(StructureManager.Structure struc in structureManager.structures)
 				if(!struc.passiveStructure && struc.discovered)
 					structureManager.DoTick (struc);
+			if(shouldRefreshStructs)
+				structureManager.RefreshHiringStructures();
 			foreach(ResourceManager.Resource res in resourceManager.resources)
 				resourceManager.DoTick(res);
 		
