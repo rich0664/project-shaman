@@ -3,6 +3,6 @@ using System.Collections;
 
 [System.Serializable]
 public class VillagerSkill{
-	public string structName;
+	public string skillGroup;
 	public float skillLevel;
 }

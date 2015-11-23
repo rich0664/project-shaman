@@ -5,6 +5,7 @@ using System.Linq;
 
 public class VillagerManager : MonoBehaviour {
 
+	public float skillRate = 0.1f;
 	public List<Villager> villagers;
 	GameManager GM;
 	int iDentifier = 0;
@@ -31,19 +32,29 @@ public class VillagerManager : MonoBehaviour {
 					villagerI = 0;
 				Villager tmpVillager = villagers[villagerI];
 
+				//skill progression
+				if(tmpVillager.worksAt != null){
+					float deltaSkillTime = (Time.time - tmpVillager.skillTimeStamp) * skillRate;
+					string jobGroup = PStructFromIndex(tmpVillager.worksAt).structure.structCategory.ToString();
+					if(jobGroup == tmpVillager.talentGroup)
+						deltaSkillTime *= tmpVillager.talentednes;
+					tmpVillager.skillList.Find(x => x.skillGroup == jobGroup).skillLevel += deltaSkillTime;
+					tmpVillager.skillTimeStamp = Time.time;
+				}
+
 				//job stuff
 				if(GM.structureManager.hiringStructures.Count != 0){
 					int hiringCount = GM.structureManager.hiringStructures.Count;
 					int bestSkill = Random.Range(0, hiringCount);
 					if(tmpVillager.experienced){
 						float prevSkillLevel = 1f;
-						prevSkillLevel = tmpVillager.GetSkill(GM.structureManager.hiringStructures[bestSkill].name).skillLevel;
+						prevSkillLevel = tmpVillager.GetSkill(GM.structureManager.hiringStructures[bestSkill].structCategory.ToString()).skillLevel;
 						for(int i = 0; i < hiringCount; i++){
-							VillagerSkill tSkill = tmpVillager.GetSkill(GM.structureManager.hiringStructures[i].name);
+							VillagerSkill tSkill = tmpVillager.GetSkill(GM.structureManager.hiringStructures[i].structCategory.ToString());
 							if(tSkill.skillLevel > prevSkillLevel){
 								bestSkill = i;
 								prevSkillLevel = tSkill.skillLevel;
-							}
+						}
 						}
 					}
 					StructureManager.Structure optimalStruct = GM.structureManager.GetStructure(GM.structureManager.hiringStructures[bestSkill].name);
@@ -96,8 +107,14 @@ public class VillagerManager : MonoBehaviour {
 				struc.fullyActiveAmount++;
 		}
 	}
+
 	public void FireVillager(Villager villager, bool housing = false){
-		PhysicalStructure tmpPStruct = PStructFromIndex(villager.worksAt);
+		PhysicalStructure tmpPStruct;
+		if(!housing)
+			tmpPStruct = PStructFromIndex(villager.worksAt);
+		else
+			tmpPStruct = PStructFromIndex(villager.livesAt);
+
 		StructureManager.Structure struc = tmpPStruct.structure;
 		struc.workers.Remove(villager);
 		if(tmpPStruct.employeeList.Count == struc.workerCapacity)

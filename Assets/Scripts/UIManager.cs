@@ -39,8 +39,9 @@ public class UIManager : MonoBehaviour
 				StructureTooltip (strucGO.name);
 			});
 			Slider demandSlider = strucGO.transform.Find ("Struct/Slider").GetComponent<Slider> ();
+			StructureManager.Structure tStruc = struc;
 			demandSlider.onValueChanged.AddListener((value) => {
-				struc.demandAmount = value;
+				tStruc.demandAmount = value;
 				GM.structureManager.RefreshHiringStructures();
 			});
 		}
@@ -143,6 +144,7 @@ public class UIManager : MonoBehaviour
 	{
 		Transform structures = canvasObj.transform.Find ("Structures/ScrollRect/StructureList");
 		foreach (StructureManager.Structure struc in GM.structureManager.structures) {
+			//Debug.Log(struc.amount + " : " + struc.demandAmount);
 			if (!structures.Find (struc.name))
 				continue;
 			GameObject tmpStrucUI = structures.Find (struc.name).gameObject;

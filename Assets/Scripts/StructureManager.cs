@@ -10,6 +10,7 @@ public class StructureManager : MonoBehaviour {
 		public string name;
 		public string displayName;
 		public float amount;
+		public structType structCategory;
 		public bool isHouse;
 		public List<Effect> effects;
 		public List<Cost> costs;
@@ -40,12 +41,16 @@ public class StructureManager : MonoBehaviour {
 		public List<Villager> workers;
 		//[System.NonSerialized] 
 		//public List<PhysicalStructure> pStructs;
+		public enum structType{
+			House = 1,
+			Farming = 2
+		}
 	}
 	
 	public void DoTick(Structure struc){
 
 		//fire the worst people to keep up with demand
-		if(struc.activeAmount > struc.demandAmount){
+		if(struc.demandAmount < struc.activeAmount){
 			if(struc.workers.Count > 0){
 				float worst = 100f;
 				Villager worstVill = new Villager();
@@ -108,7 +113,7 @@ public class StructureManager : MonoBehaviour {
 		float totalSkill = 0f;
 		if(struc.workers.Count != 0){
 			foreach(Villager vill in struc.workers){
-				totalSkill += vill.GetSkill(struc.name).skillLevel;
+				totalSkill += vill.GetSkill(struc.structCategory.ToString()).skillLevel;
 			}
 			struc.averageSkill = totalSkill / struc.workers.Count;
 		}else{
