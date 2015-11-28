@@ -105,20 +105,18 @@ public class SaveLoad : MonoBehaviour
 
 		//Villagers
 		if(PlayerPrefs.HasKey("VillagerData"))
-			GM.villagerManager.villagers = (List<Villager>)Serializer.LoadObj("VillagerData");
+			GM.villagerManager.villagers = (HashSet<Villager>)Serializer.LoadObj("VillagerData");
 
 
 		List<StructureManager.Structure> sList = (List<StructureManager.Structure>)Serializer.LoadObj("WorkerData");
-		Debug.Log(sList[0].workers.Count);
 		foreach(StructureManager.Structure struc in GM.structureManager.structures){
 			//StructureWorkers
 			if(PlayerPrefs.HasKey("WorkerData")){
 				StructureManager.Structure serialStruc = sList.Find(x => x.name == struc.name);
 				if(serialStruc == null)
 					continue;
-				foreach(Villager serialVill in serialStruc.workers){
-					struc.workers.Add(GM.villagerManager.villagers.Find(x => x.uniqueID == serialVill.uniqueID));
-				}
+				foreach(Villager serialVill in serialStruc.workers)
+					struc.workers.Add(GM.villagerManager.villagers.Where(x => x.uniqueID == serialVill.uniqueID).First());				
 			}
 			float.TryParse(LoadString(struc.name + "Amount"), out struc.amount);
 			foreach(Cost cst in struc.costs){
@@ -174,9 +172,8 @@ public class SaveLoad : MonoBehaviour
 				int spotIndex = 0; int.TryParse(ps.pIndex, out spotIndex);
 				GM.builderHelper.lastSpot = GM.builderHelper.spotList[spotIndex - 1];
 				PhysicalStructure tmpPStruct = GM.builderHelper.QuickBuild(ps.type, true);
-				foreach(Villager vill in ps.eList){
-					tmpPStruct.employeeList.Add(GM.villagerManager.villagers.Find(x => x.uniqueID == vill.uniqueID));
-				}
+				foreach(Villager vill in ps.eList)
+					tmpPStruct.employeeList.Add(GM.villagerManager.villagers.Where(x => x.uniqueID == vill.uniqueID).First());
 			}
 		}
 

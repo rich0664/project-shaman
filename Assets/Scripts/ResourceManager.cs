@@ -12,6 +12,7 @@ public class ResourceManager : MonoBehaviour
 			Resource = 1,
 			Food = 2
 		}
+		public List<FoodEffect> foodEffects;
 		public resourceMode resourceType;
 		public float amount;
 		public Contributors contributors;
@@ -63,10 +64,7 @@ public class ResourceManager : MonoBehaviour
 		foreach(Resource res in resources)
 			resourceDictionary[res.name] = res;
 		foodMaster = GetResource("Food");
-	}	
-
-
-
+	}
 
 
 	//end class

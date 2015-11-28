@@ -1,22 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 [System.Serializable]
 public class Villager{
 
 	public string name;
 	public float age;
-	public float health;
+	public float health = 100f;
+	public float mood = 100f;
 	public string worksAt;
 	public string livesAt;
 	public string talentGroup;
 	public float talentednes;
 	public List<VillagerSkill> skillList;
+	public HashSet<ResourceManager.Resource> foodList = new HashSet<ResourceManager.Resource>();
 	public bool experienced = false;
-	[HideInInspector] public float skillTimeStamp = 0f;
+	[System.NonSerialized] public float timeStamp = 0f;
 	[HideInInspector] public int headIconIndex;
 	[HideInInspector] public int uniqueID;
+	[HideInInspector] public GameManager GM;
 
 	//[System.NonSerialized]
 	Dictionary<string, VillagerSkill> skillDictionary;
@@ -33,6 +37,12 @@ public class Villager{
 			skillDictionary[tmpSkill.skillGroup] = tmpSkill;
 			skillList.Add(tmpSkill);
 		}
+		foreach(ResourceManager.Resource res in GM.resourceManager.resources)
+			if(res.resourceType == ResourceManager.Resource.resourceMode.Food)
+				foodList.Add(res);
+		System.Random rnd = new System.Random();
+		foodList = (HashSet<ResourceManager.Resource>)foodList.OrderBy(x => rnd.Next());
+
 		float rand = Random.Range(0.0f, 1.0f);
 		if(rand <= 0.3f){
 			int randint = Random.Range(2,System.Enum.GetValues(typeof(StructureManager.Structure.structType)).Length + 1);

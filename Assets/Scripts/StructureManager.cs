@@ -65,7 +65,10 @@ public class StructureManager : MonoBehaviour {
 				GM.shouldRefreshStructs = true;
 				CalculateAverages(struc);
 			}
-		}//else if(struc.activeAmount < struc.demandAmount){
+		}else
+			CalculateAverages(struc);
+
+		//else if(struc.activeAmount < struc.demandAmount){
 		//	RefreshHiringStructures();
 		//}
 
