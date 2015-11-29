@@ -61,6 +61,8 @@ public class GameManager : MonoBehaviour {
 			foreach(ResourceManager.Resource res in resourceManager.resources) {
 				res.sumStorage = res.baseStorage;
 				res.contributors.activeProduction = 0f;
+				res.contributors.workerProduction = -res.amountEaten;
+				res.amountEaten = 0f;
 
 				if(res.resourceType == ResourceManager.Resource.resourceMode.Food)
 					resourceManager.foodMaster.amount += res.amount;

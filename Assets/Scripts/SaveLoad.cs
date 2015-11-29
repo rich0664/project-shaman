@@ -107,7 +107,6 @@ public class SaveLoad : MonoBehaviour
 		if(PlayerPrefs.HasKey("VillagerData"))
 			GM.villagerManager.villagers = (HashSet<Villager>)Serializer.LoadObj("VillagerData");
 
-
 		List<StructureManager.Structure> sList = (List<StructureManager.Structure>)Serializer.LoadObj("WorkerData");
 		foreach(StructureManager.Structure struc in GM.structureManager.structures){
 			//StructureWorkers
@@ -195,8 +194,9 @@ public class SaveLoad : MonoBehaviour
 
 	public void RESET(){
 		PlayerPrefs.DeleteKey("SaveData");
-		PlayerPrefs.DeleteKey("pStructData");
 		PlayerPrefs.DeleteKey("VillagerData");
+		PlayerPrefs.DeleteKey("pStructData");
+		PlayerPrefs.DeleteKey("WorkerData");
 		PlayerPrefs.Flush();
 		Application.LoadLevel("Main");
 	}

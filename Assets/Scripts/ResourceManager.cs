@@ -14,6 +14,7 @@ public class ResourceManager : MonoBehaviour
 		}
 		public List<FoodEffect> foodEffects;
 		public resourceMode resourceType;
+		public float amountEaten;
 		public float amount;
 		public Contributors contributors;
 		public float sumStorage;

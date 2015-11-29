@@ -6,10 +6,12 @@ using System.Linq;
 public class VillagerManager : MonoBehaviour {
 
 	public float skillRate = 0.01f;
+	public float MoodMult = 5f;
 	public float foodMult = 0.01f;
 	public float foodConsumptionRate = 1f;
 	public float averageMood = 100f;
-	public HashSet<Villager> villagers;
+	public HashSet<Villager> villagers = new HashSet<Villager>();
+	public List<Villager> villagersDebug = new List<Villager>();
 	GameManager GM;
 	int iDentifier = 0;
 	
@@ -30,6 +32,8 @@ public class VillagerManager : MonoBehaviour {
 	IEnumerator FreeWill(){
 		while(true){
 			if(!GM.paused && villagers.Count > 0){
+
+				villagersDebug = villagers.ToList();
 
 				if(villagerI >= villagers.Count)
 					villagerI = 0;
@@ -108,17 +112,23 @@ public class VillagerManager : MonoBehaviour {
 
 
 	public void VillagerMunch(Villager eatVillager){
-		int wat = eatVillager.foodList.Count / 2;
+		int wat = eatVillager.foodList.Count;
+		wat -= wat / 2;
 		float deltaFood = (Time.time - eatVillager.timeStamp) * foodMult * foodConsumptionRate;
 		foreach(ResourceManager.Resource foodle in eatVillager.foodList){
-			wat--;
-			if(foodle.amount <= 0)
+			if(foodle.amount <= 0f){
+				wat--;
 				continue;
+			}
 			float tAmount = foodle.amount; //amount eaten
-			GM.resourceManager.AddFood(foodle, -deltaFood);
-			tAmount -= foodle.amount;
+			tAmount -= deltaFood;
+			if(tAmount < 0f)
+				tAmount = 0f;
+			tAmount = foodle.amount - tAmount;
+			foodle.amountEaten += tAmount;
+			eatVillager.mood += (tAmount / deltaFood)* MoodMult * wat;
 			deltaFood -= tAmount;
-			eatVillager.mood += tAmount * wat;
+			wat--;
 			foreach(FoodEffect fect in foodle.foodEffects){
 				int enumIndex = (int)fect.foodEffectType;
 				switch (enumIndex){
@@ -130,10 +140,10 @@ public class VillagerManager : MonoBehaviour {
 					break;
 				}
 			}
-			if(deltaFood <= 0)
+			if(deltaFood <= 0f)
 				break;
 		}
-		if(deltaFood > 0){
+		if(deltaFood > 0f){
 			eatVillager.health -= deltaFood;
 		}
 	}

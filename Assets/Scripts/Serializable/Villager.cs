@@ -41,7 +41,8 @@ public class Villager{
 			if(res.resourceType == ResourceManager.Resource.resourceMode.Food)
 				foodList.Add(res);
 		System.Random rnd = new System.Random();
-		foodList = (HashSet<ResourceManager.Resource>)foodList.OrderBy(x => rnd.Next());
+		var tfoodList = foodList.OrderBy(x => rnd.Next());
+		foodList = tfoodList.ToHashSet();
 
 		float rand = Random.Range(0.0f, 1.0f);
 		if(rand <= 0.3f){
