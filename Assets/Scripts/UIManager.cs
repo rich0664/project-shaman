@@ -50,7 +50,6 @@ public class UIManager : MonoBehaviour
 
 	void Update ()
 	{
-
 		if (Input.GetMouseButtonUp (0) && isShamanMenuOpen)
 			shouldCheckMenu = true;
 
@@ -70,24 +69,35 @@ public class UIManager : MonoBehaviour
 		if (!isMenu)
 			return;
 
-		UpdateResources ();
-		UpdateStructures ();
+		switch (menuSwitch){
+			case "Structures":
+				UpdateStructures ();					
+				break;
+			case "Leadership":
+				UpdateResources ();					
+				break;
+			case "ScienceTree":
+				GM.sciTreeManager.UpdateProgressBars();		
+				break;
+		}
 
 		if (toolTip)
 			switch (toolSwitch) {
-			case 1: // resourece
-				ResourceTooltip (lastTooltip);				
-				break;
-			case 2: //structure
-				StructureTooltip (lastTooltip);
-				break;
+				case 1: // resourece
+					ResourceTooltip (lastTooltip);				
+					break;
+				case 2: //structure
+					StructureTooltip (lastTooltip);
+					break;
 			}
 	}
 
+	string menuSwitch = "";
 	public void ToggleMenu (string str)
 	{
 		isMenu = !isMenu;
 		Camera.main.GetComponent<Blur> ().enabled = isMenu;
+		menuSwitch = str;
 
 		canvasObj.transform.Find (str).gameObject.SetActive (isMenu);
 		if (str == "Structures") {
@@ -112,6 +122,8 @@ public class UIManager : MonoBehaviour
 				rosterImage.sprite = Resources.Load<Sprite> ("VillagerIcons/Heads/VH" + vill.headIconIndex.ToString());
 				rosterText.text = vill.name;
 			}
+		}else if(str == "ScienceTree"){
+			GM.sciTreeManager.open = isMenu;
 		}
 		KillTooltip(true);
 		ShamanMenu.SetActive (!isMenu);

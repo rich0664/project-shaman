@@ -17,7 +17,7 @@ public class GridManager : MonoBehaviour {
 	GameObject foliageParent;
 	float rotat = 0f;
 	int spotCount = 0;
-	[HideInInspector] public List<Transform> foliages;
+	[HideInInspector] public HashSet<Transform> foliages = new HashSet<Transform>();
 	
 	public void StartUp(){
 		//StartCoroutine(TestLoop());
@@ -41,7 +41,6 @@ public class GridManager : MonoBehaviour {
 			Destroy(foliageParent);
 
 		foliages.Clear();
-		foliages = new List<Transform>();
 		foliageParent = new GameObject();
 		foliageParent.name = "Foliage";
 		GameObject treePref = Resources.Load<GameObject>("BuildingPrefabs/Tree");

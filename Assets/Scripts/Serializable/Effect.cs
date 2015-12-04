@@ -8,6 +8,7 @@ public class Effect{
 		Resource = 1,
 		Structure = 2
 	}
+
 	public enum effectMode{
 		Produce = 1,
 		Multiply = 2,

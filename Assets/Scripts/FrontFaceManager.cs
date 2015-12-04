@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class FrontFaceManager : MonoBehaviour {
 
 	public int refreshRate = 2;
-	[HideInInspector] public List<Transform> updateList = new List<Transform>();
+	[HideInInspector] public HashSet<Transform> updateList = new HashSet<Transform>();
 	[HideInInspector] public Quaternion rot = Quaternion.Euler(Vector3.zero);
 	int delayer = 0;
 	Transform camT;

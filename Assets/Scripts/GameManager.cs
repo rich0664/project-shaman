@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour {
 	public VillagerManager villagerManager;
 	public MouseOrbit gameCamera;
 	public FrontFaceManager ffManager;
+	public SciTreeManager sciTreeManager;
 
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour {
 		unlockManager = GetComponent<UnlockManager>();
 		builderHelper = GetComponent<BuilderHelper>();
 		villagerManager = GetComponent<VillagerManager>();
+		sciTreeManager = GetComponent<SciTreeManager>();
 		gameCamera = Camera.main.GetComponent<MouseOrbit>();
 		ffManager = Camera.main.GetComponent<FrontFaceManager>();
 
@@ -42,6 +44,7 @@ public class GameManager : MonoBehaviour {
 
 		villagerManager.StartUp();
 		unlockManager.StartUp();
+		sciTreeManager.StartUp();
 		uiManager.StartUp();
 		uiManager.UpdateUI();
 
@@ -74,6 +77,8 @@ public class GameManager : MonoBehaviour {
 				structureManager.RefreshHiringStructures();
 			foreach(ResourceManager.Resource res in resourceManager.resources)
 				resourceManager.DoTick(res);
+
+			sciTreeManager.ResearchTick();
 		
 			uiManager.UpdateUI();
 		}
