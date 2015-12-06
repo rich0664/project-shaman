@@ -28,6 +28,11 @@ public class SaveLoad : MonoBehaviour
 		if(GM.villagerManager.villagers.Count > 0)
 			Serializer.SaveObj("VillagerData", GM.villagerManager.villagers.ToList());
 
+		//SciTree
+		Debug.Log(GM.sciTreeManager.nodeList.Count);
+		if(GM.sciTreeManager.nodeList.Count > 0)
+			Serializer.SaveObj("SciTreeData", GM.sciTreeManager.SerializableNodes());
+
 		foreach(ResourceManager.Resource res in GM.resourceManager.resources){
 			dataString += SaveString(res.name + "Amount", res.amount.ToString());
 			dataString += SaveString(res.name + "BaseProduct", res.contributors.baseProduction.ToString());
@@ -106,6 +111,9 @@ public class SaveLoad : MonoBehaviour
 		//Villagers
 		if(PlayerPrefs.HasKey("VillagerData"))
 			GM.villagerManager.villagers = (HashSet<Villager>)Serializer.LoadObj("VillagerData");
+
+		if(PlayerPrefs.HasKey("SciTreeData"))
+			GM.sciTreeManager.nodeData = (List<NodeDataObj>)Serializer.LoadObj("SciTreeData");
 
 		List<StructureManager.Structure> sList = (List<StructureManager.Structure>)Serializer.LoadObj("WorkerData");
 		foreach(StructureManager.Structure struc in GM.structureManager.structures){
@@ -192,7 +200,12 @@ public class SaveLoad : MonoBehaviour
 	}
 
 
-	public void RESET(){
+	public void RESET(bool hardReset = false){
+		if(!hardReset){
+			GM.sciTreeManager.ResetTreeProgress();
+			Serializer.SaveObj("SciTreeData", GM.sciTreeManager.SerializableNodes());
+		}else
+			PlayerPrefs.DeleteKey("SciTreeData");
 		PlayerPrefs.DeleteKey("SaveData");
 		PlayerPrefs.DeleteKey("VillagerData");
 		PlayerPrefs.DeleteKey("pStructData");

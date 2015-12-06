@@ -124,6 +124,7 @@ public class UIManager : MonoBehaviour
 			}
 		}else if(str == "ScienceTree"){
 			GM.sciTreeManager.open = isMenu;
+			GM.sciTreeManager.ClosePopup();
 		}
 		KillTooltip(true);
 		ShamanMenu.SetActive (!isMenu);
