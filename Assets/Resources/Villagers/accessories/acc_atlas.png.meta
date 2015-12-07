@@ -1,0 +1,155 @@
+fileFormatVersion: 2
+guid: 14b23ddd3c6c691478b1e368933ee397
+timeCreated: 1449520135
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: body_upper_acc
+    21300002: body_lower_acc
+    21300004: l_arm_acc
+    21300006: l_leg_acc
+    21300008: r_leg_acc
+    21300010: r_arm_acc
+    21300012: r_forearm_acc
+    21300014: l_forearm_acc
+    21300016: Head_acc
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: body_upper_acc
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 448
+        width: 373
+        height: 556
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: body_lower_acc
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 591
+        width: 378
+        height: 414
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: l_arm_acc
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 262
+        width: 156
+        height: 190
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: l_leg_acc
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 31
+        width: 156
+        height: 357
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: r_leg_acc
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 39
+        width: 157
+        height: 357
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: r_arm_acc
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 336
+        width: 166
+        height: 160
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: r_forearm_acc
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 235
+        width: 147
+        height: 54
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: l_forearm_acc
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 39
+        width: 99
+        height: 165
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: Head_acc
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 39
+        width: 250
+        height: 160
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
