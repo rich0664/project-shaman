@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 7ae9f50ccc0d00545a757cbee43e2629
-timeCreated: 1449498671
+timeCreated: 1449528050
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -108,7 +108,7 @@ TextureImporter:
         width: 156
         height: 357
       alignment: 9
-      pivot: {x: .532812834, y: .872797966}
+      pivot: {x: .811023235, y: .828668177}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: r_leg
       rect:
@@ -118,7 +118,7 @@ TextureImporter:
         width: 157
         height: 357
       alignment: 9
-      pivot: {x: .539124727, y: .86706233}
+      pivot: {x: .80154711, y: .821326077}
       border: {x: 0, y: 0, z: 0, w: 0}
     - name: r_arm
       rect:
