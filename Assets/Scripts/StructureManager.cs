@@ -95,6 +95,7 @@ public class StructureManager : MonoBehaviour {
 				}
 			}
 		}
+
 	}
 
 	[HideInInspector] public List<Structure> hiringStructures;

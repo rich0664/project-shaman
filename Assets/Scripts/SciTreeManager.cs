@@ -77,11 +77,11 @@ public class SciTreeManager : MonoBehaviour {
 					float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg;
 					tLine.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 					float dist = Vector3.Distance(tLine.transform.position, inNode.transform.position);
-					tLine.transform.localScale = new Vector3(dist,1f,1f);
 					if(dist > distanceThreshHold){
 						tLine.transform.SetAsFirstSibling();
 						tLine.transform.Find("TreeLine").GetComponent<Image>().color *= 0.3f;
 					}
+					tLine.transform.localScale = new Vector3(dist,1f,1f);
 				}
 
 				//sprite and color stuff
@@ -355,6 +355,7 @@ public class SciTreeManager : MonoBehaviour {
 				int branchIndex = popupItem.transform.parent.GetSiblingIndex();
 				int completeTime = (int)(((popupItem.researchRequired - popupItem.researchProgress)/deltaResearchBranches[branchIndex]) / GM.ticks);
 				//Debug.Log(deltaResearchBranches[1]);
+				completeTime++;
 				if(popupItem.beingResearched){
 					popup.transform.Find("PopupTime").GetComponent<Text>().text = "Done in " + completeTime + " seconds";
 				}else{
