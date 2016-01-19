@@ -55,12 +55,13 @@ public class StructureManager : MonoBehaviour {
 				float worst = 100f;
 				Villager worstVill = new Villager();
 				foreach(Villager vill in struc.workers){
-					float tSkill = vill.GetSkill(struc.name).skillLevel;
+					float tSkill = vill.GetSkill(struc.structCategory.ToString()).skillLevel;
 					if(tSkill < worst){
 						worst = tSkill;
 						worstVill = vill;
 					}
 				}
+				Debug.Log(worstVill.worksAt);
 				GM.villagerManager.FireVillager(worstVill, struc.isHouse);
 				GM.shouldRefreshStructs = true;
 				CalculateAverages(struc);

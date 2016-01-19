@@ -15,12 +15,12 @@ public class Villager{
 	public string talentGroup;
 	public float talentednes;
 	public List<VillagerSkill> skillList;
-	public HashSet<ResourceManager.Resource> foodList = new HashSet<ResourceManager.Resource>();
+	public List<ResourceManager.Resource> foodList = new List<ResourceManager.Resource>();
 	public bool experienced = false;
 	[System.NonSerialized] public float timeStamp = 0f;
 	[HideInInspector] public int headIconIndex;
 	[HideInInspector] public int uniqueID;
-	[HideInInspector] public GameManager GM;
+	[System.NonSerialized][HideInInspector] public GameManager GM;
 
 	//[System.NonSerialized]
 	Dictionary<string, VillagerSkill> skillDictionary;
@@ -42,7 +42,7 @@ public class Villager{
 				foodList.Add(res);
 		System.Random rnd = new System.Random();
 		var tfoodList = foodList.OrderBy(x => rnd.Next());
-		foodList = tfoodList.ToHashSet();
+		foodList = tfoodList.ToList();
 
 		float rand = Random.Range(0.0f, 1.0f);
 		if(rand <= 0.3f){
@@ -57,6 +57,7 @@ public class Villager{
 	}
 
 	public VillagerSkill GetSkill (string skillToGet){
+		//Debug.Log(skillToGet);
 		return skillDictionary [skillToGet];
 	}
 

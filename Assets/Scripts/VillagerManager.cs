@@ -64,7 +64,8 @@ public class VillagerManager : MonoBehaviour {
 
 				//Homeless
 				if(tmpVillager.livesAt == null){
-					tmpVillager.worksAt = null;
+					FireVillager(tmpVillager);
+					//tmpVillager.worksAt = null;
 					tmpVillager.mood -= 20f; //homeless debuff
 				}else{
 					//job stuff
@@ -107,7 +108,15 @@ public class VillagerManager : MonoBehaviour {
 	}
 
 	PhysicalStructure PStructFromIndex(string index){
-		return GM.builderHelper.pStructList.Where(x => x.transform.parent.name == index).First();
+		IEnumerable<PhysicalStructure> tps = null;
+		try{
+			tps = GM.builderHelper.pStructList.Where(x => x.transform.parent.name == index);
+			//Debug.Log(index + " : " + tps.Count());
+			return tps.First();
+		}catch(System.Exception e){
+			Debug.Log(index + " - WAT - " + e);
+		}
+		return null;
 	}
 
 
@@ -176,11 +185,16 @@ public class VillagerManager : MonoBehaviour {
 
 	public void FireVillager(Villager villager, bool housing = false){
 		PhysicalStructure tmpPStruct;
-		if(!housing)
+
+		if(!housing){
+			if(villager.worksAt == null)
+				return;
 			tmpPStruct = PStructFromIndex(villager.worksAt);
-		else
+		}else
 			tmpPStruct = PStructFromIndex(villager.livesAt);
 
+		if(tmpPStruct == null)
+			return;
 		StructureManager.Structure struc = tmpPStruct.structure;
 		struc.workers.Remove(villager);
 		if(tmpPStruct.employeeList.Count == struc.workerCapacity)

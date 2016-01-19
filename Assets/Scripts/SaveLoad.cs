@@ -110,7 +110,7 @@ public class SaveLoad : MonoBehaviour
 
 		//Villagers
 		if(PlayerPrefs.HasKey("VillagerData"))
-			GM.villagerManager.villagers = (HashSet<Villager>)Serializer.LoadObj("VillagerData");
+			GM.villagerManager.villagers = ((List<Villager>)Serializer.LoadObj("VillagerData")).ToHashSet();
 
 		if(PlayerPrefs.HasKey("SciTreeData"))
 			GM.sciTreeManager.nodeData = (List<NodeDataObj>)Serializer.LoadObj("SciTreeData");
