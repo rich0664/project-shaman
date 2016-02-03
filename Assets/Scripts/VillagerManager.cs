@@ -43,10 +43,15 @@ public class VillagerManager : MonoBehaviour {
 				//skill progression
 				if(tmpVillager.worksAt != null){
 					float deltaSkillTime = (Time.time - tmpVillager.timeStamp) * skillRate;
-					string jobGroup = PStructFromIndex(tmpVillager.worksAt).structure.structCategory.ToString();
-					if(jobGroup == tmpVillager.talentGroup)
-						deltaSkillTime *= tmpVillager.talentednes;
-					tmpVillager.skillList.Find(x => x.skillGroup == jobGroup).skillLevel += deltaSkillTime;
+					try{
+						string jobGroup = PStructFromIndex(tmpVillager.worksAt).structure.structCategory.ToString();
+						if(jobGroup == tmpVillager.talentGroup)
+							deltaSkillTime *= tmpVillager.talentednes;
+						tmpVillager.skillList.Find(x => x.skillGroup == jobGroup).skillLevel += deltaSkillTime;
+					}catch{
+						//yield return new WaitForEndOfFrame();
+						//continue;
+					}
 				}
 
 				VillagerMunch(tmpVillager);
@@ -129,16 +134,17 @@ public class VillagerManager : MonoBehaviour {
 				wat--;
 				continue;
 			}
-			float tAmount = foodle.amount; //amount eaten
+			ResourceManager.Resource realFoodle = GM.resourceManager.GetResource(foodle.name);
+			float tAmount = realFoodle.amount; //amount eaten
 			tAmount -= deltaFood;
 			if(tAmount < 0f)
 				tAmount = 0f;
-			tAmount = foodle.amount - tAmount;
-			foodle.amountEaten += tAmount;
+			tAmount = realFoodle.amount - tAmount;
+			realFoodle.amountEaten += tAmount;
 			eatVillager.mood += (tAmount / deltaFood)* MoodMult * wat;
 			deltaFood -= tAmount;
 			wat--;
-			foreach(FoodEffect fect in foodle.foodEffects){
+			foreach(FoodEffect fect in realFoodle.foodEffects){
 				int enumIndex = (int)fect.foodEffectType;
 				switch (enumIndex){
 				case 1: //HealthBuff

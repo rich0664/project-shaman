@@ -14,6 +14,7 @@ public class StructureManager : MonoBehaviour {
 		public bool isHouse;
 		public List<Effect> effects;
 		public List<Cost> costs;
+		public float sizeScale = 1f;
 
 		[Header("Misc Settings")]
 		public float constructTime = 1f;
@@ -43,7 +44,9 @@ public class StructureManager : MonoBehaviour {
 		//public List<PhysicalStructure> pStructs;
 		public enum structType{
 			House = 1,
-			Farming = 2
+			Farming = 2,
+			Research = 3,
+			Storage = 4
 		}
 	}
 	
@@ -61,7 +64,6 @@ public class StructureManager : MonoBehaviour {
 						worstVill = vill;
 					}
 				}
-				Debug.Log(worstVill.worksAt);
 				GM.villagerManager.FireVillager(worstVill, struc.isHouse);
 				GM.shouldRefreshStructs = true;
 				CalculateAverages(struc);
@@ -99,7 +101,7 @@ public class StructureManager : MonoBehaviour {
 
 	}
 
-	[HideInInspector] public List<Structure> hiringStructures;
+	public List<Structure> hiringStructures;
 	public void RefreshHiringStructures(){
 		hiringStructures = structures.Where(x => !x.isHouse && x.fullyActiveAmount < x.demandAmount).ToList();
 		GM.builderHelper.hiringPStructList = GM.builderHelper.pStructList.Where(x => x.structure.workerCapacity != x.employeeList.Count).ToHashSet();
@@ -124,7 +126,10 @@ public class StructureManager : MonoBehaviour {
 		}else{
 			struc.averageSkill = totalSkill;
 		}
-		struc.averageCapacity = struc.workers.Count / (struc.workerCapacity * struc.amount);
+		if(struc.workerCapacity * struc.amount == 0)
+			struc.averageCapacity = 0;
+		else
+			struc.averageCapacity = struc.workers.Count / (struc.workerCapacity * struc.amount);
 	}
 
 	public Structure GetStructure (string structToGet){

@@ -36,7 +36,7 @@ public class PhysicalStructure : MonoBehaviour {
 		}
 		//structure.pStructs.Add(this);
 		Destroy(constructTimer);
-		transform.Find("BSprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
+		transform.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
 	}
 
 }

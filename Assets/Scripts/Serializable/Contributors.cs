@@ -33,15 +33,15 @@ public class Contributors{
 	public string ToTooltip(){
 		string tmpStr = "";
 		if(baseProduction != 0)
-			tmpStr += "Base: " + baseProduction + "/s\n";
+			tmpStr += "Base: " + baseProduction.ToString("F3") + "/s\n";
 		if(workerProduction != 0)
-			tmpStr += "Workers: " + workerProduction + "/s\n";
+			tmpStr += "Workers: " + workerProduction.ToString("F3") + "/s\n";
 		if(upgradeMult != 0)
 			tmpStr += "Upgrades: " + upgradeMult * 100f + "%\n";
 		if(structureMult != 0)
 			tmpStr += "Structures: " + structureMult * 100f + "%\n";
 		if(activeProduction != 0)
-			tmpStr += "Active: " + activeProduction + "/s\n";
+			tmpStr += "Active: " + activeProduction.ToString("F3") + "/s\n";
 
 		return tmpStr;
 	}
