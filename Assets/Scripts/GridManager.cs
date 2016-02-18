@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour {
 
-	public float expandIncrement = 0.3f;
+	public float incrementDist = 0.3f;
 	public float rotationIncrement = 22.5f;
 	public int expandAt = 4;
 	public int expandInc = 8;
@@ -45,10 +45,13 @@ public class GridManager : MonoBehaviour {
 		foliageParent.name = "Foliage";
 		GameObject treePref = Resources.Load<GameObject>("BuildingPrefabs/Tree");
 		GameObject shrubPref = Resources.Load<GameObject>("BuildingPrefabs/Shrub");
+		float startdist = FurthestSpotDist(false);
+		if(startdist == 7)
+			startdist = 0f;
 		for(int i = 0; i < foliageCount; i++){
 			GameObject treeInst = GameObject.Instantiate(shrubPref);
 			treeInst.transform.SetParent(foliageParent.transform);
-			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(11.5f, 41.5f));
+			treeInst.transform.localPosition = new Vector3(0f, 0f, startdist + Random.Range(11.5f, 41.5f));
 			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-6.0f, 6.0f));
 			treeInst.transform.localScale *= Random.Range(0.4f, 1.1f);
 			foliages.Add(treeInst.transform);
@@ -57,7 +60,7 @@ public class GridManager : MonoBehaviour {
 		for(int i = 0; i < treeIT; i++){
 			GameObject treeInst = GameObject.Instantiate(treePref);
 			treeInst.transform.SetParent(foliageParent.transform);
-			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(14f, 34.5f));
+			treeInst.transform.localPosition = new Vector3(0f, 0f, startdist + Random.Range(14f, 34.5f));
 			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / treeIT) * i + Random.Range(-6.0f, 6.0f));
 			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
 			foliages.Add(treeInst.transform);
@@ -65,7 +68,7 @@ public class GridManager : MonoBehaviour {
 		for(int i = 0; i < foliageCount; i++){
 			GameObject treeInst = GameObject.Instantiate(treePref);
 			treeInst.transform.SetParent(foliageParent.transform);
-			treeInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + Random.Range(35.5f, 60.5f));
+			treeInst.transform.localPosition = new Vector3(0f, 0f, startdist + Random.Range(35.5f, 60.5f));
 			treeInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / foliageCount) * i + Random.Range(-10.0f, 10.0f));
 			treeInst.transform.localScale *= Random.Range(0.55f, 0.95f);
 			foliages.Add(treeInst.transform);
@@ -83,13 +86,14 @@ public class GridManager : MonoBehaviour {
 			rotationIncrement /= 2f;
 			rotat = rotationIncrement;
 		}
+		float exDist = FurthestSpotDist();
 		GameObject Ring = new GameObject();
 		Ring.name = "Ring" + (rings + 1); Ring.transform.SetParent(ringParent.transform);
 		for(int i = 0; i < spots; i++){
 			spotCount++;
 			GameObject spotInst = GameObject.Instantiate(spotPref);
 			spotInst.transform.SetParent(Ring.transform);
-			spotInst.transform.localPosition = new Vector3(0f, 0f, expandIncrement * rings + 7f);
+			spotInst.transform.localPosition = new Vector3(0f, 0f, exDist);
 			spotInst.transform.RotateAround(Vector3.zero, Vector3.up, (360f / spots) * i);
 			spotInst.name = spotCount.ToString();
 			GM.builderHelper.spotList.Add(spotInst.GetComponent<Spot>());
@@ -107,5 +111,23 @@ public class GridManager : MonoBehaviour {
 		GM.gameCamera.ExpandDistance(52f);
 		GameObject.Find("DiscoveredGround").transform.localScale += Vector3.one * 2f;
 	}
+
+	float FurthestSpotDist(bool addInc = true){
+		Transform rpt = ringParent.transform;
+		if(rpt.childCount == 0)
+			return incrementDist * rings + 7f;
+		Transform lr = rpt.GetChild(rpt.childCount - 1);
+
+		float lastDist = 0f;
+		for(int i = 0; i < lr.childCount; i++){
+			float dist = Vector3.Distance(Vector3.zero, lr.GetChild(i).position);
+			if(dist > lastDist)
+				lastDist = dist;
+		}
+		if(addInc)
+			lastDist += incrementDist;
+		return lastDist;
+	}
+
 
 }

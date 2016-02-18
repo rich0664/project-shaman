@@ -94,7 +94,7 @@ public class BuilderHelper : MonoBehaviour {
 		if(!instant){
 			float currentT = 0f;
 			float animT = 0.2f;
-			Debug.Log(endColliders.Count + " : " + endPositions.Count);
+			//Debug.Log(endColliders.Count + " : " + endPositions.Count);
 			while(currentT < animT){
 				currentT += Time.deltaTime;
 				for(int i = 0; i < endColliders.Count; i++)
