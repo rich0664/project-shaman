@@ -43,10 +43,15 @@ public class VillagerManager : MonoBehaviour {
 				//skill progression
 				if(tmpVillager.worksAt != null){
 					float deltaSkillTime = (Time.time - tmpVillager.timeStamp) * skillRate;
-					string jobGroup = PStructFromIndex(tmpVillager.worksAt).structure.structCategory.ToString();
-					if(jobGroup == tmpVillager.talentGroup)
-						deltaSkillTime *= tmpVillager.talentednes;
-					tmpVillager.skillList.Find(x => x.skillGroup == jobGroup).skillLevel += deltaSkillTime;
+					try{
+						string jobGroup = PStructFromIndex(tmpVillager.worksAt).structure.structCategory.ToString();
+						if(jobGroup == tmpVillager.talentGroup)
+							deltaSkillTime *= tmpVillager.talentednes;
+						tmpVillager.skillList.Find(x => x.skillGroup == jobGroup).skillLevel += deltaSkillTime;
+					}catch{
+						//yield return new WaitForEndOfFrame();
+						//continue;
+					}
 				}
 
 				VillagerMunch(tmpVillager);
@@ -64,7 +69,8 @@ public class VillagerManager : MonoBehaviour {
 
 				//Homeless
 				if(tmpVillager.livesAt == null){
-					tmpVillager.worksAt = null;
+					FireVillager(tmpVillager);
+					//tmpVillager.worksAt = null;
 					tmpVillager.mood -= 20f; //homeless debuff
 				}else{
 					//job stuff
@@ -107,7 +113,15 @@ public class VillagerManager : MonoBehaviour {
 	}
 
 	PhysicalStructure PStructFromIndex(string index){
-		return GM.builderHelper.pStructList.Where(x => x.transform.parent.name == index).First();
+		IEnumerable<PhysicalStructure> tps = null;
+		try{
+			tps = GM.builderHelper.pStructList.Where(x => x.transform.parent.name == index);
+			//Debug.Log(index + " : " + tps.Count());
+			return tps.First();
+		}catch(System.Exception e){
+			Debug.Log(index + " - WAT - " + e);
+		}
+		return null;
 	}
 
 
@@ -120,16 +134,17 @@ public class VillagerManager : MonoBehaviour {
 				wat--;
 				continue;
 			}
-			float tAmount = foodle.amount; //amount eaten
+			ResourceManager.Resource realFoodle = GM.resourceManager.GetResource(foodle.name);
+			float tAmount = realFoodle.amount; //amount eaten
 			tAmount -= deltaFood;
 			if(tAmount < 0f)
 				tAmount = 0f;
-			tAmount = foodle.amount - tAmount;
-			foodle.amountEaten += tAmount;
+			tAmount = realFoodle.amount - tAmount;
+			realFoodle.amountEaten += tAmount;
 			eatVillager.mood += (tAmount / deltaFood)* MoodMult * wat;
 			deltaFood -= tAmount;
 			wat--;
-			foreach(FoodEffect fect in foodle.foodEffects){
+			foreach(FoodEffect fect in realFoodle.foodEffects){
 				int enumIndex = (int)fect.foodEffectType;
 				switch (enumIndex){
 				case 1: //HealthBuff
@@ -176,11 +191,16 @@ public class VillagerManager : MonoBehaviour {
 
 	public void FireVillager(Villager villager, bool housing = false){
 		PhysicalStructure tmpPStruct;
-		if(!housing)
+
+		if(!housing){
+			if(villager.worksAt == null)
+				return;
 			tmpPStruct = PStructFromIndex(villager.worksAt);
-		else
+		}else
 			tmpPStruct = PStructFromIndex(villager.livesAt);
 
+		if(tmpPStruct == null)
+			return;
 		StructureManager.Structure struc = tmpPStruct.structure;
 		struc.workers.Remove(villager);
 		if(tmpPStruct.employeeList.Count == struc.workerCapacity)

@@ -40,6 +40,7 @@ public class BuilderHelper : MonoBehaviour {
 	}
 
 	public PhysicalStructure BuildOnSpot(string typeToBuild, bool instant){
+		lastSpot.transform.localScale = Vector3.one * 0.725f;
 		GameObject buildInst = GameObject.Instantiate(Resources.Load<GameObject>("BuildingPrefabs/Construction"));
 		GameObject timerInst = GameObject.Instantiate(GameObject.Find("WorldCanvasOcc").transform.Find("Templates/ConstructionTimer").gameObject);
 		timerInst.transform.SetParent(GameObject.Find("WorldCanvasOcc").transform);
@@ -47,14 +48,18 @@ public class BuilderHelper : MonoBehaviour {
 		timerInst.transform.position = lastSpot.transform.position;
 		buildInst.transform.SetParent(lastSpot.transform);
 		buildInst.transform.localPosition = Vector3.zero;
-		buildInst.transform.GetChild(0).rotation = Camera.main.transform.rotation;
-		//buildInst.transform.localScale = Vector3.one;
+		buildInst.transform.rotation = Camera.main.transform.rotation;
 		PhysicalStructure pStruct = buildInst.GetComponent<PhysicalStructure>();
 		pStruct.structure = GM.structureManager.GetStructure(typeToBuild);
+		lastSpot.transform.localScale *= pStruct.structure.sizeScale;
+
+		//push
+		StartCoroutine(AnimPush(lastSpot, pStruct.structure.sizeScale, instant));
+
 		pStruct.GM = GM;
 		pStruct.constructTimer = timerInst;
 		//pStructList.Add(pStruct);
-		GM.ffManager.updateList.Add(pStruct.transform.GetChild(0));
+		GM.ffManager.updateList.Add(pStruct.transform);
 		if(instant){
 			pStruct.constructTime = 0f;
 		}else{
@@ -63,6 +68,43 @@ public class BuilderHelper : MonoBehaviour {
 		pStruct.spotIndex = pStruct.transform.parent.name;
 		pStruct.StartConstruct();
 		return pStruct;
+	}
+
+	IEnumerator AnimPush(Spot lastS, float sizeScale, bool instant = false){
+		float maxDist = 20f * sizeScale;
+		Collider[] hitColliders = Physics.OverlapSphere(lastSpot.transform.position, maxDist);
+		List<Vector3> endPositions = new List<Vector3>();
+		List<Collider> endColliders = new List<Collider>();
+		foreach(Collider hc in hitColliders){
+			if(hc.transform == lastSpot.transform)
+				continue;
+			Vector3 heading = hc.transform.position - lastSpot.transform.position;
+			float dist = heading.magnitude;
+			if(dist >= maxDist)
+				continue;
+			Vector3 dir = heading / dist;
+			//Debug.Log(dir);
+			dist = maxDist - dist;
+			dist /= maxDist;
+			dist *= sizeScale - 1f;
+			//Debug.Log(dist);
+			endColliders.Add(hc);
+			endPositions.Add(hc.transform.position + (dir * dist * 2f));
+		}
+		if(!instant){
+			float currentT = 0f;
+			float animT = 0.2f;
+			//Debug.Log(endColliders.Count + " : " + endPositions.Count);
+			while(currentT < animT){
+				currentT += Time.deltaTime;
+				for(int i = 0; i < endColliders.Count; i++)
+					endColliders[i].transform.position = Vector3.Lerp(endColliders[i].transform.position, endPositions[i], currentT / animT);			
+				yield return new WaitForEndOfFrame();
+			}
+		}
+		for(int i = 0; i < endColliders.Count; i++)
+			endColliders[i].transform.position = endPositions[i];
+		
 	}
 
 	bool isHeld = false;

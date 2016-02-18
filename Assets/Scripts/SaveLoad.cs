@@ -110,12 +110,15 @@ public class SaveLoad : MonoBehaviour
 
 		//Villagers
 		if(PlayerPrefs.HasKey("VillagerData"))
-			GM.villagerManager.villagers = (HashSet<Villager>)Serializer.LoadObj("VillagerData");
+			GM.villagerManager.villagers = ((List<Villager>)Serializer.LoadObj("VillagerData")).ToHashSet();
 
+		//scitree
 		if(PlayerPrefs.HasKey("SciTreeData"))
 			GM.sciTreeManager.nodeData = (List<NodeDataObj>)Serializer.LoadObj("SciTreeData");
 
+		//worker data
 		List<StructureManager.Structure> sList = (List<StructureManager.Structure>)Serializer.LoadObj("WorkerData");
+		//structure settings
 		foreach(StructureManager.Structure struc in GM.structureManager.structures){
 			//StructureWorkers
 			if(PlayerPrefs.HasKey("WorkerData")){
@@ -145,6 +148,7 @@ public class SaveLoad : MonoBehaviour
 			}
 			GM.structureManager.CalculateAverages(struc);
 		}
+		//resource settings
 		foreach(ResourceManager.Resource res in GM.resourceManager.resources){
 			float.TryParse(LoadString(res.name + "Amount"), out res.amount);
 			float.TryParse(LoadString(res.name + "BaseProduct"), out res.contributors.baseProduction);
@@ -161,18 +165,11 @@ public class SaveLoad : MonoBehaviour
 		int tmpRings = 0; int.TryParse(LoadString("GridRings"), out tmpRings);
 		if(tmpRings > 0){
 			for(int i = 0; i < tmpRings - 1; i++)
-				GM.gridManager.TryExpand(false);			
+				GM.gridManager.TryExpand(false);
 			GM.gridManager.TryExpand(true);
 		}
 
-		/*Physicsal Structures
-		int psCount = 0; int.TryParse(LoadString("PStructCount"), out psCount);
-		for(int i = 0; i < psCount; i++){
-			int spotIndex = 0; int.TryParse(LoadString("PStructIndex" + i.ToString()), out spotIndex);
-			GM.builderHelper.lastSpot = GM.builderHelper.spotList[spotIndex - 1];
-			GM.builderHelper.QuickBuild(LoadString("PStructType" + i.ToString()), true);
-		}
-		*/
+		//physical structures
 		if(PlayerPrefs.HasKey("pStructData")){
 			List<pStructInfo> pSI = (List<pStructInfo>)Serializer.LoadObj("pStructData");
 			foreach(pStructInfo ps in pSI){
