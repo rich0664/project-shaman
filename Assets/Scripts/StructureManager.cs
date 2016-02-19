@@ -46,7 +46,8 @@ public class StructureManager : MonoBehaviour {
 			House = 1,
 			Farming = 2,
 			Research = 3,
-			Storage = 4
+			Storage = 4,
+			Foraging = 5
 		}
 	}
 	

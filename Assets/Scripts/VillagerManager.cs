@@ -31,7 +31,7 @@ public class VillagerManager : MonoBehaviour {
 	int villagerI = 0;
 	IEnumerator FreeWill(){
 		while(true){
-			if(!GM.paused && villagers.Count > 0){
+			if(!GameManager.paused && villagers.Count > 0){
 
 				villagersDebug = villagers.ToList();
 
@@ -112,12 +112,12 @@ public class VillagerManager : MonoBehaviour {
 		}
 	}
 
-	PhysicalStructure PStructFromIndex(string index){
-		IEnumerable<PhysicalStructure> tps = null;
+	public PhysicalStructure PStructFromIndex(string index){
+		PhysicalStructure tps = null;
 		try{
-			tps = GM.builderHelper.pStructList.Where(x => x.transform.parent.name == index);
+			tps = GM.builderHelper.pStructList.Find(x => x.transform.parent.name == index);
 			//Debug.Log(index + " : " + tps.Count());
-			return tps.First();
+			return tps;
 		}catch(System.Exception e){
 			Debug.Log(index + " - WAT - " + e);
 		}

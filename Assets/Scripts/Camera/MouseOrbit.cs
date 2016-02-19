@@ -39,6 +39,7 @@ public class MouseOrbit : MonoBehaviour
 
 		GM = GameObject.Find ("Management").GetComponent<GameManager> ();
 		invertPan = GameObject.Find ("UICanvas").transform.Find("GameMenu/InvertPan").GetComponent<Toggle>();
+		GetComponent<Camera>().transparencySortMode = TransparencySortMode.Orthographic;
 	}
 
 	public void SetSensitivity (float sensitivity){

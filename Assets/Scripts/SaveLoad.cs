@@ -29,7 +29,7 @@ public class SaveLoad : MonoBehaviour
 			Serializer.SaveObj("VillagerData", GM.villagerManager.villagers.ToList());
 
 		//SciTree
-		Debug.Log(GM.sciTreeManager.nodeList.Count);
+		//Debug.Log(GM.sciTreeManager.nodeList.Count);
 		if(GM.sciTreeManager.nodeList.Count > 0)
 			Serializer.SaveObj("SciTreeData", GM.sciTreeManager.SerializableNodes());
 

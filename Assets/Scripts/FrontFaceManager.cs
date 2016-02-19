@@ -35,4 +35,6 @@ public class FrontFaceManager : MonoBehaviour {
 			}
 		}
 	}
+
+	//end class
 }

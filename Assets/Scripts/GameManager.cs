@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-	public bool paused = false;
+	public static bool paused = false;
 	public float ticks = 10f;
 
 	public SaveLoad saveLoad;
@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour {
 	public MouseOrbit gameCamera;
 	public FrontFaceManager ffManager;
 	public SciTreeManager sciTreeManager;
+	public AIManager aiManager;
 
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour {
 		builderHelper = GetComponent<BuilderHelper>();
 		villagerManager = GetComponent<VillagerManager>();
 		sciTreeManager = GetComponent<SciTreeManager>();
+		aiManager = GetComponent<AIManager>();
 		gameCamera = Camera.main.GetComponent<MouseOrbit>();
 		ffManager = Camera.main.GetComponent<FrontFaceManager>();
 
@@ -47,6 +49,7 @@ public class GameManager : MonoBehaviour {
 		sciTreeManager.StartUp();
 		uiManager.StartUp();
 		uiManager.UpdateUI();
+		aiManager.StartUp();
 
 		delay = 1f / ticks;
 		StartCoroutine (GameLoop ());

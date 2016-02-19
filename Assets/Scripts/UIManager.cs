@@ -62,10 +62,15 @@ public class UIManager : MonoBehaviour
 
 	public void UpdateUI ()
 	{
-		if (toolTip)
-		if (toolSwitch == 3)
-			QuickBuildTooltip ();
-
+		if (toolTip){
+			if (toolSwitch == 3)
+				QuickBuildTooltip ();
+			//if (toolSwitch == 4)
+				//StructInfo(GM.builderHelper.lastSpot.pStruct);
+			if (toolSwitch == 5)
+				VillagerInfo(lastToolVillager);
+		}
+		
 		if (!isMenu)
 			return;
 
@@ -186,6 +191,7 @@ public class UIManager : MonoBehaviour
 	public int toolSwitch = 0;
 	List<string> couldBuyList;
 
+
 	public void StructInfo(PhysicalStructure pStruc){
 		if(GM.builderHelper.isPlacing)
 			return;
@@ -218,6 +224,39 @@ public class UIManager : MonoBehaviour
 			rosterText.text = vill.name;
 		}
 
+	}
+
+	Villager lastToolVillager;
+	public void VillagerInfo(Villager villager){
+		if(GM.builderHelper.isPlacing)
+			return;
+		if(toolTip)
+			Destroy(toolTip);
+		lastTooltip = "VillagerInfo";
+		toolSwitch = 5;
+		lastToolVillager = villager;
+		Transform templates = canvasObj.transform.Find ("Templates");
+		GameObject sInfoTemp = templates.Find ("VillagerInfo").gameObject;
+		toolTip = GameObject.Instantiate (sInfoTemp);
+		toolTip.transform.SetParent (templates);
+		toolTip.name = "VillagerInfoTooltip";
+		toolTip.SetActive (true);
+		toolTip.transform.localScale = Vector3.one;
+		toolTip.transform.localPosition = Vector3.zero;
+		Sprite strucIcon = Resources.Load<Sprite> ("VillagerIcons/Heads/VH" + villager.headIconIndex);
+		toolTip.transform.Find ("VillagerIcon").GetComponent<Image> ().sprite = strucIcon;
+
+		toolTip.transform.Find ("NameText").GetComponent<Text>().text = villager.name;
+		PhysicalStructure vWork = GM.villagerManager.PStructFromIndex(villager.worksAt);
+		PhysicalStructure vHome = GM.villagerManager.PStructFromIndex(villager.livesAt);
+		if(vWork)
+			toolTip.transform.Find ("WorkText").GetComponent<Text>().text += vWork.structure.displayName;
+		else
+			toolTip.transform.Find ("WorkText").GetComponent<Text>().text = "Unemployed";
+		if(vHome)
+			toolTip.transform.Find ("HomeText").GetComponent<Text>().text += vHome.structure.displayName;
+		else
+			toolTip.transform.Find ("HomeText").GetComponent<Text>().text = "Homeless";
 	}
 
 	public void QuickBuildTooltip ()

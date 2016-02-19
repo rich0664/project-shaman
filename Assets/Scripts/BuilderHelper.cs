@@ -11,14 +11,14 @@ public class BuilderHelper : MonoBehaviour {
 	[HideInInspector] public Spot lastSpot;
 	[HideInInspector] public List<Spot> spotList;
 	[HideInInspector] public List<Spot> emptySpots;
-	[HideInInspector] public HashSet<PhysicalStructure> pStructList;
+	[HideInInspector] public List<PhysicalStructure> pStructList;
 	[HideInInspector] public HashSet<PhysicalStructure> hiringPStructList;
 	[HideInInspector] public HashSet<pStructInfo> pStructData;
 
 	// Use this for initialization
 	public void StartUp () {
 		GM = GetComponent<GameManager>();
-		pStructList = new HashSet<PhysicalStructure>();
+		pStructList = new List<PhysicalStructure>();
 		pStructData = new HashSet<pStructInfo>();
 	}
 	
@@ -138,7 +138,7 @@ public class BuilderHelper : MonoBehaviour {
 	[HideInInspector] public bool isPlacing = false;
 	IEnumerator ManualPlace(){
 		int tmpAmount = (int)GM.uiManager.toolTip.transform.Find ("Slider").GetComponent<Slider> ().value;
-		isPlacing = true; GM.uiManager.ToggleMenu("Structures"); GM.paused = true;
+		isPlacing = true; GM.uiManager.ToggleMenu("Structures"); GameManager.paused = true;
 		GM.gameCamera.targetDistance = 1000f;	GM.gameCamera.ReCenterCamera();
 		GameObject targeter = GameObject.Find("UICanvas").transform.Find("BuildTargeter").gameObject;
 		targeter.SetActive(true); string toBuild = GM.uiManager.lastTooltip;
@@ -154,7 +154,7 @@ public class BuilderHelper : MonoBehaviour {
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition + new Vector3(0f,60f,0f)); RaycastHit hit;
 		if(Physics.Raycast(ray, out hit))
 			StartCoroutine(BatchBuild(toBuild, tmpAmount, hit.point));
-		isPlacing = false; GM.paused = false; targeter.SetActive(false);
+		isPlacing = false; GameManager.paused = false; targeter.SetActive(false);
 	}
 
 	IEnumerator BatchBuild(string toBuild, int buildCount, Vector3 buildCenter){
@@ -218,6 +218,7 @@ public class BuilderHelper : MonoBehaviour {
 		if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()){
 			if(GM.uiManager.toolTip){
 				GM.uiManager.KillTooltip(true);
+				GM.aiManager.ResetCameraTarget();
 				return;
 			}
 		}else{
@@ -226,16 +227,19 @@ public class BuilderHelper : MonoBehaviour {
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 		if(Physics.Raycast(ray, out hit)){
-			if(!hit.transform.GetComponent<Spot>()){
-				return;
-			}else{
+			if(hit.transform.GetComponent<Spot>()){
 				lastSpot = hit.transform.GetComponent<Spot>();
+				//Debug.Log(hit.collider.gameObject);
+				if(!lastSpot.filled){
+					GM.uiManager.QuickBuildTooltip();
+				}else{
+					GM.uiManager.StructInfo(lastSpot.GetComponentInChildren<PhysicalStructure>());
+				}
 			}
-			//Debug.Log(hit.collider.gameObject);
-			if(!lastSpot.filled){
-				GM.uiManager.QuickBuildTooltip();
-			}else{
-				GM.uiManager.StructInfo(lastSpot.GetComponentInChildren<PhysicalStructure>());
+			if(hit.transform.parent == GM.aiManager.villagerParent.transform){
+				//GM.gameCamera.target = hit.transform;
+				VillagerAI tvai = hit.transform.GetComponent<VillagerAI>();
+				GM.uiManager.VillagerInfo(tvai.villager);
 			}
 		}
 	}

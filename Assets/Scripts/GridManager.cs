@@ -112,7 +112,7 @@ public class GridManager : MonoBehaviour {
 		GameObject.Find("DiscoveredGround").transform.localScale += Vector3.one * 2f;
 	}
 
-	float FurthestSpotDist(bool addInc = true){
+	public float FurthestSpotDist(bool addInc = true){
 		Transform rpt = ringParent.transform;
 		if(rpt.childCount == 0)
 			return incrementDist * rings + 7f;

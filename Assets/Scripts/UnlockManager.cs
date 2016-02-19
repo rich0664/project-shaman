@@ -33,7 +33,7 @@ public class UnlockManager : MonoBehaviour {
 	IEnumerator UnlockLoop(){
 		while(true){
 			yield return new WaitForSeconds(1.0f);
-			if(GM.paused)
+			if(GameManager.paused)
 				continue;
 			CheckUnlocks();
 		}
