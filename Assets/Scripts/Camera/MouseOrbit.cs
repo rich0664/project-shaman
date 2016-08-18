@@ -18,13 +18,13 @@ public class MouseOrbit : MonoBehaviour
 	public float maxZoom = 500f;
 	public float offsetLimit = 1f;
 	public float GPanSpeed = 80f;
-	float overZoom = 0f;
-	Vector3 targOffset = Vector3.zero;
-	float x = 0.0f;
-	float y = 0.0f;
+	public float overZoom = 0f;
+	public Vector3 targOffset = Vector3.zero;
+	public float x = 0.0f;
+	public float y = 0.0f;
 	GameManager GM;
 	Toggle invertPan;
-	float distance = 5f;
+	public float distance = 5f;
 	
 	// Use this for initialization
 	void Start ()
@@ -196,6 +196,8 @@ public class MouseOrbit : MonoBehaviour
 			transform.rotation = Quaternion.Slerp (transform.rotation, rotation, Time.deltaTime * 12f);
 			transform.position = Vector3.Lerp (transform.position, position, Time.deltaTime * 12f);
 			
+		}else{
+			GM.aiManager.ResetCameraTarget();
 		}
 		
 	}

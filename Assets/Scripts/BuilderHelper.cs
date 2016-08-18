@@ -197,7 +197,7 @@ public class BuilderHelper : MonoBehaviour {
 	}
 
 	void CheckClick(){
-		if(GM.uiManager.isMenu )
+		if(GM.uiManager.isMenu && GM.uiManager.lastTooltip != "VillagerInfo")
 			return;
 		if(!Input.GetMouseButtonUp(0) && !Input.GetMouseButtonDown(0))
 			return;
@@ -218,7 +218,9 @@ public class BuilderHelper : MonoBehaviour {
 		if(!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()){
 			if(GM.uiManager.toolTip){
 				GM.uiManager.KillTooltip(true);
-				GM.aiManager.ResetCameraTarget();
+				if(GM.aiManager.resetTarget){
+					GM.aiManager.ResetCameraTarget();
+				}
 				return;
 			}
 		}else{
@@ -237,7 +239,7 @@ public class BuilderHelper : MonoBehaviour {
 				}
 			}
 			if(hit.transform.parent == GM.aiManager.villagerParent.transform){
-				//GM.gameCamera.target = hit.transform;
+				//GM.aiManager.SetCameraTarget(hit.transform);
 				VillagerAI tvai = hit.transform.GetComponent<VillagerAI>();
 				GM.uiManager.VillagerInfo(tvai.villager);
 			}

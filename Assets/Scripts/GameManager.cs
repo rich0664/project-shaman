@@ -4,6 +4,7 @@ using System.Collections;
 public class GameManager : MonoBehaviour {
 
 	public static bool paused = false;
+	public static GameManager SGM;
 	public float ticks = 10f;
 
 	public SaveLoad saveLoad;
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour {
 	void Start (){
 		QualitySettings.vSyncCount = 0;  // VSync must be disabled
 		Application.targetFrameRate = 30;
+		SGM = this;
 
 		saveLoad = GetComponent<SaveLoad> ();
 		resourceManager = GetComponent<ResourceManager> ();
@@ -82,6 +84,8 @@ public class GameManager : MonoBehaviour {
 				resourceManager.DoTick(res);
 
 			sciTreeManager.ResearchTick();
+
+			villagerManager.averageMood = villagerManager.MoodAverage();
 		
 			uiManager.UpdateUI();
 		}
@@ -97,5 +101,23 @@ public class GameManager : MonoBehaviour {
 
 	}
 
-	//end class
+    public static void Print<T>(T objToPrint) {
+        Debug.Log(objToPrint);
+    }
+
+    public static void PrintIf<T>(bool ifTrue, T objToPrint) {
+        if(ifTrue)
+            Debug.Log(objToPrint);
+    }
+
+    public static void PrintException(System.Exception ex, string info = "", bool stackTrace = false) {
+        string bi = "";
+        if(info != "")
+            bi = info + ": ";
+        Print(bi + ex.Message);
+        if(stackTrace)
+            Print(ex.StackTrace);
+    }
+
+    //end class
 }

@@ -42,14 +42,18 @@ public class AIManager : MonoBehaviour {
 				if(outVillagers.Contains(tVill))
 					continue;
 
+				tVill.SetColors();
 				outVillagers.Add(tVill);
 				GameObject villAInst = GameObject.Instantiate(villagerPref);
 				villAInst.name = tVill.name;
 				villAInst.transform.parent = villagerParent.transform;
-				Vector3 spawnPos = tStruct.transform.position; spawnPos.x += Random.Range(-spawnRadius, spawnRadius); spawnPos.z += Random.Range(-spawnRadius, spawnRadius);
+				Vector3 spawnPos = tStruct.transform.position; spawnPos.x += Random.Range(0f, spawnRadius) + spawnRadius;
 				villAInst.transform.position = spawnPos;
-				villAInst.transform.localScale *= villagerSize;
+				villAInst.transform.RotateAround(tStruct.transform.position, Vector3.up, Random.Range(0, 360));
+				//villAInst.transform.localScale = new Vector3(villagerSize * tVill.width, villagerSize * tVill.height, 1f);
+				villAInst.transform.localScale = new Vector3(villagerSize, villagerSize, 1f);
 				VillagerAI instAI = villAInst.GetComponent<VillagerAI>(); instAI.villager = tVill; instAI.jobStruct = tStruct; instAI.GM = GM;
+				instAI.StartUp();
 				GM.ffManager.updateList.Add(villAInst.transform);
 				GM.ffManager.rot = Quaternion.Euler(Vector3.zero);
 			}
@@ -59,10 +63,50 @@ public class AIManager : MonoBehaviour {
 				i = 0;
 		}
 	}
+		
+	public float targetDistance = 5.0f;
+	public float overZoom = 0f;
+	public float x = 0.0f;
+	public float y = 0.0f;
+	public float distance = 5f;
+	public Vector3 targOffset = Vector3.zero;
 
+	public bool resetTarget = false;
 
+	public void SetCameraTarget(Transform target){
+		targetDistance = GM.gameCamera.targetDistance;
+		overZoom = GM.gameCamera.overZoom;
+		x = GM.gameCamera.x;
+		y = GM.gameCamera.y;
+		distance = GM.gameCamera.distance;
+		targOffset = GM.gameCamera.targOffset;
+
+		GM.gameCamera.targetDistance = 90f;
+		//GM.gameCamera.distance = 5f;
+		//GM.gameCamera.overZoom = 0f;
+		GM.gameCamera.transform.position = target.position;
+		GM.gameCamera.transform.LookAt(GM.gameCamera.target);
+		GM.gameCamera.x = GM.gameCamera.transform.eulerAngles.y;
+		GM.gameCamera.y = 15f;
+		GM.gameCamera.targOffset = (Vector3.zero - target.position).normalized * 9f;
+
+		GM.uiManager.isMenu = true;
+		resetTarget = true;
+		GM.gameCamera.target = target;
+	}
 
 	public void ResetCameraTarget(){
+		Debug.Log(1);
+
+		GM.gameCamera.targetDistance = targetDistance;
+		GM.gameCamera.distance = distance;
+		GM.gameCamera.overZoom = overZoom;
+		GM.gameCamera.x = x;
+		GM.gameCamera.y = y;
+		GM.gameCamera.targOffset = targOffset;
+
+		GM.uiManager.isMenu = false;
+		resetTarget = false;
 		GM.gameCamera.target = GameObject.Find("Ground/target").transform;
 	}
 

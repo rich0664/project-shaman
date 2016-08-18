@@ -23,6 +23,8 @@ public class StructureManager : MonoBehaviour {
 		public bool discovered;
 		public string description;
 		public string footNote;
+		public bool hasExt = false;
+		public int extOverflow = 0;
 
 		[Header("Active Settings")]
 		public bool passiveStructure = true;

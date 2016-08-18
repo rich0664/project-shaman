@@ -14,6 +14,8 @@ public class VillagerManager : MonoBehaviour {
 	public List<Villager> villagersDebug = new List<Villager>();
 	GameManager GM;
 	int iDentifier = 0;
+	public Color[] BodyColors; 
+	public Color[] EyeColors; 
 	
 	public void StartUp () {
 		GM = GetComponent<GameManager>();
@@ -67,10 +69,13 @@ public class VillagerManager : MonoBehaviour {
 					}
 				}
 
+				if(tmpVillager.relationships == null)
+					tmpVillager.relationships = new List<VillagerRelationship>();
+
 				//Homeless
 				if(tmpVillager.livesAt == null){
-					FireVillager(tmpVillager);
-					//tmpVillager.worksAt = null;
+					if(tmpVillager.worksAt != null)
+						FireVillager(tmpVillager);
 					tmpVillager.mood -= 20f; //homeless debuff
 				}else{
 					//job stuff
@@ -98,10 +103,32 @@ public class VillagerManager : MonoBehaviour {
 							tmpVillager.experienced = true;
 						}
 					}
+
+					//mood/relationship stuff
+					PhysicalStructure tmpLiveStruct = PStructFromIndex(tmpVillager.livesAt);
+					if(tmpLiveStruct == null)
+						continue;
+					foreach(Villager tv in tmpLiveStruct.employeeList)
+						if(tv != tmpVillager)
+							CheckRelationship(tmpVillager, tv);
+					
 					if(tmpVillager.worksAt == null){
 						tmpVillager.mood += 20f; //enemployed but housed buff
+					}else{
+						PhysicalStructure tmpWorkStruct = PStructFromIndex(tmpVillager.worksAt);
+						if(tmpWorkStruct == null)
+							continue;
+						foreach(Villager tv in tmpWorkStruct.employeeList)
+							if(tv != tmpVillager)
+								CheckRelationship(tmpVillager, tv);						
 					}
 				}
+
+                float avgRelationMood = 1;
+                if(tmpVillager.relationships.Count > 0)
+                    avgRelationMood = tmpVillager.relationships.Average(x => x.relationshipValue) * 10f - 10f;
+				//Debug.Log(avgRelationMood);
+				tmpVillager.mood += avgRelationMood;
 
 
 				//end algorithm and ++ to next villager
@@ -110,6 +137,83 @@ public class VillagerManager : MonoBehaviour {
 			}
 			yield return new WaitForEndOfFrame();
 		}
+	}
+
+	public static void CheckRelationship(Villager vill1, Villager vill2){
+		if(vill2.relationships == null)
+			vill2.relationships = new List<VillagerRelationship>();
+		VillagerRelationship relVill = vill1.relationships.Find(x => x.targetVillagerID == vill2.uniqueID);
+		VillagerRelationship relVill2 = vill2.relationships.Find(x => x.targetVillagerID == vill1.uniqueID);
+		float interestRating = InterestRating(vill1, vill2) * 2f / 10000f - 0.0001f;
+		//Debug.Log(interestRating);
+		if(relVill == null){
+			relVill = new VillagerRelationship(vill2.uniqueID);
+			relVill.relationshipValue = Mathf.Clamp(relVill.relationshipValue + interestRating, 0f, 2f);
+			vill1.relationships.Add(relVill);
+		}else{
+			relVill.relationshipValue = Mathf.Clamp(relVill.relationshipValue + interestRating, 0f, 2f);
+		}
+		if(relVill2 == null){
+			relVill2 = new VillagerRelationship(vill1.uniqueID);
+			relVill2.relationshipValue = Mathf.Clamp(relVill2.relationshipValue + interestRating, 0f, 2f);
+			vill2.relationships.Add(relVill2);
+		}else{
+			relVill2.relationshipValue = Mathf.Clamp(relVill2.relationshipValue + interestRating, 0f, 2f);
+		}
+	}
+
+	static float InterestRating(Villager vill1, Villager vill2){
+		float Similarness = 0;
+		Similarness += ListPercentSimilar(vill1.foodList, vill2.foodList);
+		//Similarness += ListPercentSimilar(vill1.skillList, vill2.skillList);
+		Similarness /= 1f;
+		return Similarness;
+	}
+
+	public static float ListPercentSimilar(List<ResourceManager.Resource> list1, List<ResourceManager.Resource> list2){
+		int diffCount = 0;
+		for(int i = 0; i < list1.Count; i++){
+			var item1 = list1[i];
+			int ti = -1;
+			ResourceManager.Resource tr = list2.Find(x => x.name == item1.name);
+			if(tr != null)
+				ti = list2.IndexOf(tr);
+			//Debug.Log(ti);
+			if(ti != -1){
+				diffCount += Mathf.Abs(i - ti);
+			}
+		}
+		float difference = (float)diffCount / (float)MaxDiff(list1.Count);
+		difference = 1f - difference;
+		//Debug.Log(difference);
+		return difference;
+	}
+	public static float ListPercentSimilar(List<VillagerSkill> list1, List<VillagerSkill> list2){
+		int diffCount = 0;
+		for(int i = 0; i < list1.Count; i++){
+			var item1 = list1[i];
+			int ti = -1;
+			VillagerSkill tr = list2.Find(x => x.skillGroup == item1.skillGroup);
+			if(tr != null)
+				ti = list2.IndexOf(tr);
+			Debug.Log(ti);
+			if(ti != -1){
+				diffCount += Mathf.Abs(i - ti);
+			}
+		}
+		float difference = (float)diffCount / (float)MaxDiff(list1.Count);
+		difference = 1f - difference;
+		//Debug.Log(difference);
+		return difference;
+	}
+
+	static int MaxDiff(int listCount){
+		int counter = listCount - 1;
+		for(int i = listCount - 2; i > 0; i--)
+			counter += i;
+		if(counter == 0)
+			counter = 1;
+		return counter;
 	}
 
 	public PhysicalStructure PStructFromIndex(string index){
@@ -164,11 +268,19 @@ public class VillagerManager : MonoBehaviour {
 	}
 
 	public float MoodAverage(){
-		//float tMood = 0f;
-		//foreach(Villager mVill in villagers)
-			//tMood += mVill.mood;
-		float tMood = villagers.Sum(x => x.mood);
-		return tMood / (float)villagers.Count;
+        float avg = 0;
+        if(villagers.Count > 0) {
+            try {
+                avg = villagers.Average(x => x.mood);
+            } catch(System.Exception ex) {
+                GameManager.Print(villagers.Count);
+                GameManager.PrintException(ex, "avg error");
+            }
+        } else {
+            return 0;
+        }
+
+        return avg;
 	}
 
 	public void HireVillager(Villager villager, StructureManager.Structure struc){

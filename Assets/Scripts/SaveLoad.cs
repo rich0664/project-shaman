@@ -126,7 +126,7 @@ public class SaveLoad : MonoBehaviour
 				if(serialStruc == null)
 					continue;
 				foreach(Villager serialVill in serialStruc.workers)
-					struc.workers.Add(GM.villagerManager.villagers.Where(x => x.uniqueID == serialVill.uniqueID).First());				
+					struc.workers.Add(GM.villagerManager.villagers.Where(x => x.uniqueID == serialVill.uniqueID).First());
 			}
 			float.TryParse(LoadString(struc.name + "Amount"), out struc.amount);
 			foreach(Cost cst in struc.costs){

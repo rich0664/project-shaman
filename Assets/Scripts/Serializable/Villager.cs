@@ -15,16 +15,32 @@ public class Villager{
 	public string talentGroup;
 	public float talentednes;
 	public List<VillagerSkill> skillList;
+	public List<VillagerRelationship> relationships = new List<VillagerRelationship>();
 	public List<ResourceManager.Resource> foodList = new List<ResourceManager.Resource>();
 	public bool experienced = false;
 	[System.NonSerialized] public float timeStamp = 0f;
-	[HideInInspector] public int headIconIndex;
-	[HideInInspector] public int uniqueID;
+	public int uniqueID;
 	[System.NonSerialized][HideInInspector] public GameManager GM;
+
+	[HideInInspector] public int headIconIndex;
+	[HideInInspector] public SerColor bodyColor;
+	[HideInInspector] public SerColor eyeColor;
+	[HideInInspector] public float width = 1f;
+	[HideInInspector] public float height = 1f;
 
 	//[System.NonSerialized]
 	Dictionary<string, VillagerSkill> skillDictionary;
 
+	public void SetColors(){
+		if(bodyColor == null)
+			bodyColor = GameManager.SGM.villagerManager.BodyColors[Random.Range(0, GameManager.SGM.villagerManager.BodyColors.Length)];
+		if(eyeColor == null)
+			eyeColor = GameManager.SGM.villagerManager.EyeColors[Random.Range(0, GameManager.SGM.villagerManager.EyeColors.Length)];
+		if(width == 0){
+			width = Random.Range(0.8f, 1.2f);
+			height = Random.Range(0.8f, 1.2f);
+		}
+	}
 
 	// Use this for initialization
 	public void Start () {
@@ -54,6 +70,9 @@ public class Villager{
 		talentednes = Random.Range(3.0f, 6.0f);
 
 		headIconIndex = Random.Range(0,8);
+		width = Random.Range(0.8f, 1.2f);
+		height = Random.Range(0.8f, 1.2f);
+		SetColors();
 	}
 
 	public VillagerSkill GetSkill (string skillToGet){

@@ -9,6 +9,7 @@ public class PhysicalStructure : MonoBehaviour {
 	[HideInInspector] public GameManager GM;
 	[HideInInspector] public GameObject constructTimer;
 	[HideInInspector] public float constructTime;
+	[HideInInspector] public bool built = false;
 	[HideInInspector] public string spotIndex;
 	public List<Villager> employeeList;
 
@@ -36,7 +37,23 @@ public class PhysicalStructure : MonoBehaviour {
 		}
 		//structure.pStructs.Add(this);
 		Destroy(constructTimer);
-		transform.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
+		if(structure.hasExt){
+			Collider[] hitColliders = Physics.OverlapSphere(transform.position, 4f);
+			int sameCount = 0;
+			foreach(Collider c in hitColliders){
+				PhysicalStructure tcps = c.GetComponentInChildren<PhysicalStructure>();
+				if(tcps){
+					if(tcps.built && tcps.structure == structure)
+						sameCount++;
+				}
+			}
+			if(sameCount > 0 && sameCount < structure.extOverflow){
+				transform.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name + "_Ext");
+			}else
+				transform.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
+		}else
+			transform.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite> ("BuildingSprites/" + structure.name);
+		built = true;
 	}
 
 }

@@ -19,7 +19,7 @@ public class ResourceManager : MonoBehaviour
 		public Contributors contributors;
 		public float sumStorage;
 		public float baseStorage;
-		[System.NonSerialized] public Color dispColor = Color.black;
+		public SerColor dispColor = Color.black;
 		public bool discovered;
 	}
 

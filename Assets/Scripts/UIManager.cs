@@ -229,20 +229,30 @@ public class UIManager : MonoBehaviour
 	Villager lastToolVillager;
 	public void VillagerInfo(Villager villager){
 		if(GM.builderHelper.isPlacing)
-			return;
-		if(toolTip)
-			Destroy(toolTip);
+			return;		
+
+		Transform templates = canvasObj.transform.Find ("Templates");
+		GameObject sInfoTemp = templates.Find ("VillagerInfo").gameObject;
+		bool createNew = false;
+		if(toolTip){
+			if(lastTooltip != "VillagerInfo"){
+				Destroy(toolTip); createNew = true;
+			}
+		}else
+			createNew = true;
+		
+		if(createNew){
+			toolTip = GameObject.Instantiate (sInfoTemp);
+			toolTip.transform.SetParent (templates);
+			toolTip.name = "VillagerInfoTooltip";
+			toolTip.SetActive (true);
+			toolTip.transform.localScale = Vector3.one;
+			toolTip.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -15f);
+		}
 		lastTooltip = "VillagerInfo";
 		toolSwitch = 5;
 		lastToolVillager = villager;
-		Transform templates = canvasObj.transform.Find ("Templates");
-		GameObject sInfoTemp = templates.Find ("VillagerInfo").gameObject;
-		toolTip = GameObject.Instantiate (sInfoTemp);
-		toolTip.transform.SetParent (templates);
-		toolTip.name = "VillagerInfoTooltip";
-		toolTip.SetActive (true);
-		toolTip.transform.localScale = Vector3.one;
-		toolTip.transform.localPosition = Vector3.zero;
+
 		Sprite strucIcon = Resources.Load<Sprite> ("VillagerIcons/Heads/VH" + villager.headIconIndex);
 		toolTip.transform.Find ("VillagerIcon").GetComponent<Image> ().sprite = strucIcon;
 
@@ -250,11 +260,11 @@ public class UIManager : MonoBehaviour
 		PhysicalStructure vWork = GM.villagerManager.PStructFromIndex(villager.worksAt);
 		PhysicalStructure vHome = GM.villagerManager.PStructFromIndex(villager.livesAt);
 		if(vWork)
-			toolTip.transform.Find ("WorkText").GetComponent<Text>().text += vWork.structure.displayName;
+			toolTip.transform.Find ("WorkText").GetComponent<Text>().text = "Works at a " + vWork.structure.displayName;
 		else
 			toolTip.transform.Find ("WorkText").GetComponent<Text>().text = "Unemployed";
 		if(vHome)
-			toolTip.transform.Find ("HomeText").GetComponent<Text>().text += vHome.structure.displayName;
+			toolTip.transform.Find ("HomeText").GetComponent<Text>().text = "Lives in a " + vHome.structure.displayName;
 		else
 			toolTip.transform.Find ("HomeText").GetComponent<Text>().text = "Homeless";
 	}
